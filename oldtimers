@@ -1,0 +1,54 @@
+// const Timer = () => {
+//   const [timer, setTimer] = useState({minutes: 0, seconds: 5})
+  
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       console.log('effect')
+//       if (timer.seconds === 0) {
+//         console.log('0')
+//         setTimer(prev => ({minutes: prev.minutes -1, seconds: prev.seconds + 60}))
+//       }
+//       if (timer.seconds === 0 && timer.minutes === 0) console.log('object')
+//       setTimer((prevState, props) => ({...prevState, seconds: prevState.seconds-1}))
+
+//     }, 1000)
+//     return () => {
+//       clearInterval(interval)
+//     }
+//   }, [])
+
+//   return (
+//     <div>
+//       {`${timer.minutes}:${timer.seconds}`}
+//     </div>
+//   )
+// }
+
+// function useTimer(initial) {
+//   const [timer, setTimer] = useState(initial)
+
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       setTimer(prev => prev - 1)
+
+//       if (timer === 0) {
+//         clearInterval(interval)
+//       }
+//     }, 1000)
+
+//     return () => {
+//       clearInterval(interval)
+//     }
+//   }, [])
+
+//   return timer
+// }
+
+// function Timer() {
+//   const timer = useTimer(5)
+
+//   console.log(timer)
+//   // if (timer === 0) return <div>timer is 0</div>
+
+//   return <div>{timer}</div> /* format mm:ss ;) */
+// }

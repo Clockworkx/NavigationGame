@@ -1,167 +1,292 @@
-import { GoogleMap, LoadScript, StreetViewPanorama } from '@react-google-maps/api'
-import {Rnd} from 'react-rnd'
-import { useState } from 'react'
+// import { Rnd } from 'react-rnd'
+// import { useState } from 'react'
+import React from 'react'
 import './index.css';
-
-const App = () => {
-  const [coords, setCoords] = useState([])
-
-  const [sizeWH, setSizeWH] = useState({width: 320, height: 200})
-  const [position, setPosition] = useState({x: 0, y: 0})
-  const [dragging, setDragging] = useState(false)
-  const [containerStyle, setContainerStyle] = useState({
-    width: '320px',
-    height: '200px'
-  })
-  const [center, setCenter] = useState({
-    lat: -3.745,
-    lng: -38.523
-  })
-
-  const handleCenterChange1 = (event) => {
-    console.log(event.target.value)
-    setCenter({...center,lat: Number(event.target.value) })
-  }
-  const handleCenterChange2 = (event) => {
-    console.log(event.target.value)
-    setCenter({...center,lng: Number(event.target.value) })
-  }
-
-  return (
-    <div onMouseEnter={() => null} onMouseLeave={()=> null}className="testt">
-    
-      
-      mouse click position {coords}
-      <Rnd className="Map" 
-      default={{
-        x: 500,
-        y: 500,
-        width: 320,
-        height: 200
-      }}
-      size={{width: sizeWH.width, height: sizeWH.height}}
-      position={{x: position.x, y: position.y}}
-      onDragStop={(e, d) => {
-        console.log('asd', d)
-        setPosition({x: d.x, y:d.y})
-      }}
-      
-      onResize={(e,direction, ref, delta, position) =>{
-        // console.log('e',e, 'd',direction, 'ref,', ref, 'delta',delta,'pos', position)
-        // console.log('a....',{...position})
-        const newSize = {width: ref.offsetWidth, height: ref.offsetHeight}
-        setSizeWH(newSize)
-        setPosition({...position})
-        
-        setContainerStyle(newSize)
-      }}
-      disableDragging={dragging}
-      > 
-        <Map setCoords={setCoords} containerStyle={containerStyle} center={center}/>
-        </Rnd>
-
-
-        <Rnd className="Street" 
-      default={{
-        x: 500,
-        y: 500,
-        width: 320,
-        height: 200
-      }}
-      size={{width: sizeWH.width, height: sizeWH.height}}
-      position={{x: position.x, y: position.y}}
-      onDragStop={(e, d) => {
-        console.log('asd', d)
-        setPosition({x: d.x, y:d.y})
-      }}
-      
-      onResize={(e,direction, ref, delta, position) =>{
-        // console.log('e',e, 'd',direction, 'ref,', ref, 'delta',delta,'pos', position)
-        // console.log('a....',{...position})
-        const newSize = {width: ref.offsetWidth, height: ref.offsetHeight}
-        setSizeWH(newSize)
-        setPosition({...position})
-        
-        setContainerStyle(newSize)
-        
-      }}
-      disableDragging={dragging}
-      > 
-         <Street containerStyle={containerStyle} center={center} />
-        </Rnd>
-       
-
-
-
-
-        <div>
-        asd<button onClick={() => setDragging(!dragging)}>CLICK</button>
-        <input onChange={handleCenterChange1}/>
-        <input onChange={handleCenterChange2}/>
-        <button onClick={() => setCenter({lat:51.16569})}> asd
-        </button>
-        </div>
-        
-    </div>
-  )
-}
-
-// cancel={".test"}
-const Map = ({setCoords, containerStyle, center}) => {
-  const handleMapClick = (eventt) => {
-    setCoords(`Latitude: ${eventt.latLng.lat()} Longitude: ${eventt.latLng.lng()}`)
-  }
-  
-  return (
-    <div className="map1">
-          <LoadScript googleMapsApiKey="AIzaSyANah7Rp_9i7F0FkhJ0w50q9TGqQbUErOM">
-      <GoogleMap 
-        mapContainerStyle={containerStyle}
-        center={center}
-        zoom={10}
-        onClick={handleMapClick}
-        >
-      </GoogleMap>
-    </LoadScript>
-    </div>
-  )
-
-}
-// const containerStyle = {
-//   width: '400px',
-//   height: '400px'
-// };
+import {Map, StreetView} from './components/GoogleMaps'
+// import CurrentGameInfo from './components/CurrentGameInfo'
+import Timer from './components/Timer'
+import { useState, useRef, useEffect } from 'react'
+import {socket} from './services/socket'
 
 // const center = {
-//   lat: -3.745,
-//   lng: -38.523
-// };
+//   lat: 51.165691,
+//   lng: 10.451526
+// }
 
-function Street({containerStyle, center}) {
+const Round = ({setGameStatus}) => {
+  const [ timerState, setTimerState ] = useState(null)
+  console.log('timerState', timerState)
+
+  if (timerState === 0) {
+    setGameStatus("isPostRoundDisplay")
+    return <> </>
+  }
+
   return (
-    <LoadScript
-      googleMapsApiKey="AIzaSyANah7Rp_9i7F0FkhJ0w50q9TGqQbUErOM"
-    >
-      <GoogleMap
-        mapContainerStyle={containerStyle
-          }
-        center={center}
-        zoom={10}
-      >
-            <StreetViewPanorama
-      position={{
-        lat: -3.745,
-        lng: -38.523
-      }}
-      visible={true}
-    />
-        { /* Child components, such as markers, info windows, etc. */ }
-        <></>
-      </GoogleMap>
-    </LoadScript>
+    <div className="Container">
+      <Navbar />
+      <StreetView />
+      <Map />
+      <CurrentGameInfo setTimerState={setTimerState}/>
+    </div>
+  )
+}
+const App = () => {
+  const [gameStatus, setGameStatus] = useState("isInRound")
+  const [currentRound, setCurrentRound] = useState(1)
+
+
+  switch (gameStatus) {
+    case "isInRound":
+      return (
+        <Round setGameStatus={setGameStatus} />
+      )
+      break;
+    case "isPostRoundDisplay":
+        return (
+          <MidgameResults currentRound={currentRound} setCurrentRound={setCurrentRound} setGameStatus={setGameStatus}/>
+        )
+        break;
+    case "isGameOver":
+          return (
+            <GameOverResults />
+          )
+          break;
+  
+    default:
+      return (
+        <div>Something went wrong</div>
+      )
+      break;
+  }
+}
+
+const GameOverResults = () => {
+  return (
+    <div>Game Over</div>
   )
 }
 
+const InfoDisplay = () => {
+  return (
+    <div className="infoDisplay">
+      {/* mouse click position {coords} */}
+      lorem ipsum
+      {/* <div>
+        <button onClick={() => setDragging(!dragging)}>disable drag</button>
+      </div> */}
+    </div>
+  )
 
+}
+
+const CurrentGameInfo = ({timerState, setTimerState, formatted}) => {
+    const [isGameStarted, setIsGameStarted] = useState(false)
+
+    const handleStartGame = (event) => {
+        console.log(event)
+        setIsGameStarted(!isGameStarted)
+
+    }
+    if (isGameStarted){
+      return (
+        <div>
+            <Timer setTimerState={setTimerState}/>    
+            Round , 
+        </div>
+    )
+    
+    }
+    else return (
+      <div>Waiting for Host to start game
+          <button onClick={handleStartGame}>Start Game</button>
+      </div>
+      )
+}
+
+const Navbar = () => {
+
+  const [inviteReceived, setinviteReceived] = useState(false)
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected')
+    })
+    socket.on('disconnect', () => {
+      console.log('disconnected')
+    })
+    socket.on('INVITE_RECEIVED', () => setinviteReceived(!inviteReceived))
+    console.log('hi')
+    return () => {
+      socket.offAny(() => console.log('off any'))
+      console.log('cleanup')
+    }
+  }, [])
+  return (
+    <div className="navbar" > <h1>Professor Geo {" "} <span role="img" aria-label="geo">🐱‍🏍</span></h1>
+    {/* <Search /> */}
+    <button onClick={() => {socket.emit('hello', ['test'])}}>get random map</button>
+    {inviteReceived ? "pending invite" : "no pending invite"}
+    </div>
+  )
+}
+
+const InterimResults = ({currentRound, setCurrentRound, setGameStatus}) => {
+
+  const handleNextRound = () => {
+    if (currentRound < 5){
+      setGameStatus("isInRound")
+      setCurrentRound(previousState => previousState + 1)
+    }
+
+    if (currentRound === 5) {
+      setGameStatus("isGameOver")
+      return <> </>
+    }
+
+  }
+
+  return (
+    <div>
+      Marco da best 
+      <button onClick={handleNextRound}>Next Round</button>
+    </div>
+  )
+
+}
+
+const MidgameResults = ({currentRound, setCurrentRound, setGameStatus}) => {
+
+  return (
+    <div className="midgameResults">
+      <Navbar />
+  <Map/>
+  <InterimResults currentRound={currentRound} setCurrentRound={setCurrentRound} setGameStatus={setGameStatus} />
+    </div>
+  )
+
+
+}
+
+
+// const Map = () => {
+
+//   const [coords, setCoords] = useState([])
+
+//   const [sizeWH, setSizeWH] = useState({ width: 320, height: 200 })
+//   const [position, setPosition] = useState({ x: 0, y: 0 })
+//   const [dragging, setDragging] = useState(false)
+//   const [containerStyle, setContainerStyle] = useState({
+//     width: '100%',
+//     height: '100%'
+//   })
+
+
+// const handleMapClick = (eventt) => {
+//   setCoords(`Latitude: ${eventt.latLng.lat()} Longitude: ${eventt.latLng.lng()}`)
+// }
+
+// const containerStyle = {
+//   width: "100%",
+//   height: "100%"
+// };
+// const style = {
+//   display: "flex",
+//   alignItems: "center",
+//   justifyContent: "center",
+//   border: "solid 20px #ddd",
+//   background: "#f0f0f0"
+// };
+
+// class Map extends React.Component {
+//   constructor() {
+//     super();
+//     this.state = {
+//       width: 200,
+//       height: 200,
+//       x: 10,
+//       y: 10
+//     };
+//   }
+
+//   render() {
+//     return (
+//         <div class="mapflex">
+//           <button>test</button>
+//         <Rnd
+//           className={Map}
+//           style={{backgroundColor: "#ff6f69", border: "10px solid green"}}
+//           size={{ width: this.state.width, height: this.state.height }}
+//           position={{ x: this.state.x, y: this.state.y }}
+//           onDragStop={(e, d) => {
+//             this.setState({ x: d.x, y: d.y });
+//           }}
+//           onResizeStop={(e, direction, ref, delta, position) => {
+//             this.setState({
+//               width: ref.style.width,
+//               height: ref.style.height,
+//               ...position
+//             });
+//           }}
+//         >t<button>asd</button>
+//         est
+//           {/* <LoadScript googleMapsApiKey="AIzaSyANah7Rp_9i7F0FkhJ0w50q9TGqQbUErOM">
+//             <GoogleMap
+//               mapContainerStyle={containerStyle}
+//               center={center}
+//               zoom={10}
+//               onClick={() => {
+//                 console.log(this.state.x);
+//               }}
+//             ></GoogleMap>
+//           </LoadScript> */}
+//         </Rnd>
+//         </div>
+//     );
+//   }
+// }
+
+// const Street = ({ center }) => {
+//   const [coords, setCoords] = useState([])
+
+//   const [sizeWH, setSizeWH] = useState({ width: 320, height: 200 })
+//   const [position, setPosition] = useState({ x: 0, y: 0 })
+//   const [dragging, setDragging] = useState(false)
+//   const [containerStyleStreetView, setContainerStyleStreetView] = useState({
+//     width: '100%',
+//     height: '100%'
+//   })
+//   const [pano, setPano] = useState({
+//     lat: -3.745,
+//     lng: -38.523
+//   })
+
+//   return (
+//     <div className="StreetView">
+//       {/* <button onClick={() => {setPano({
+//     lat: -3.745,
+//     lng: -38.523
+//   })}}>change location</button> */}
+//       <LoadScript
+//         googleMapsApiKey="AIzaSyANah7Rp_9i7F0FkhJ0w50q9TGqQbUErOM"
+//       >
+//         <GoogleMap
+//           mapContainerStyle={containerStyleStreetView}
+//           center={center}
+//           zoom={10}
+//         >
+//           <StreetViewPanorama
+//             position={pano}
+//             visible={true}
+//             options={{disableDefaultUI: true, enableCloseButton: false}}
+//             onLoad={(panorama => setPano(panorama))}
+            
+//           />
+//           { /* Child components, such as markers, info windows, etc. */}
+//           <></>
+//         </GoogleMap>
+//       </LoadScript>
+//     </div>
+//   )
+// }
 
 export default App;

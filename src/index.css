@@ -1,18 +1,77 @@
-body {
+
+.Container {
+  color: rgb(3, 3, 3);
+  font-size: large;
+  background-color: #0e8bf1;
+
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr);
+  grid-template-rows: 5vh 60vh 30vh 5vh;
+}
+
+.midgameResults {
+  color: rgb(3, 3, 3);
+  font-size: large;
+  background-color: #0e8bf1;
+
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr);
+  grid-template-rows: 5vh 60vh 30vh;
+}
+
+.Map {
+  background-color:#ff6f69;
+  z-index: 5;
+}
+
+h1 {
+  top: 1rem;
+  left: 1rem;
+  color:rgb(45, 15, 211);
+  z-index: 15;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.StreetView {
+  border: 20px solid rgb(15, 219, 219);
+  background-color: #ffcc5c;
+  z-index: 0;
 }
 
-.test {
-  color: green;
-  background-color: aqua;
+.navbar {
+    display:flex;
+  justify-content: right;
+  background-color: #96ceb4;
 }
+
+.infoDisplay {
+  background-color: rgb(202, 53, 170);
+}
+
+/* .container > div:nth-child(1n) {
+  background-color: #96ceb4;	
+}
+
+.container > div:nth-child(3n) {
+  background-color: #88d8b0;
+}
+
+.container > div:nth-child(2n) {
+      background-color: #ff6f69;
+}
+
+.container > div:nth-child(4n) {
+      background-color: #ffcc5c;
+}
+ */
+
+ /* .search {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px;
+  z-index: 10;
+} */
