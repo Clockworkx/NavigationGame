@@ -8,7 +8,21 @@
   grid-template-columns: minmax(300px, 1fr);
   grid-template-rows: 5vh 60vh 30vh 5vh;
 }
+.Game {
+  background-color:rgb(202, 53, 170);
+}
 
+body {
+  margin: 0;
+}
+.Game {
+  background-color:rgb(202, 53, 170);
+}
+
+.Navbar > ul {
+  display: flex;
+  justify-content: space-between;
+}
 .midgameResults {
   color: rgb(3, 3, 3);
   font-size: large;
@@ -38,11 +52,24 @@ h1 {
   background-color: #ffcc5c;
   z-index: 0;
 }
-
-.navbar {
-    display:flex;
-  justify-content: right;
-  background-color: #96ceb4;
+.Navbar {
+  background-color: #265b86;
+}
+ul {
+  display: flex;
+  align-items: stretch; /* Default */
+  justify-content: space-between;
+  width: 100%;
+  background: #096fce5b;
+  margin: 0;
+  padding: 0;
+}
+li {
+  display: block;
+  color: #110d04;
+  flex: 0 1 auto; /* Default */
+  list-style-type: none;
+  background: #dacece;
 }
 
 .infoDisplay {
