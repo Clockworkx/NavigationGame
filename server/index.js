@@ -136,9 +136,14 @@ const getLocations = () => {
    return locations
 }
 
+const games = []
 const createNewGame = (creationDetails) => {
-    
-    
+    const gameId = games.length 
+    console.log({...creationDetails, gameId})
+    games.push({...creationDetails, gameId})
+    console.log(games[gameId])
+    console.log('games', games)
+    return games[gameId]
 }
 
 app.use(cors())
@@ -192,7 +197,7 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/game', (request, response) => {
     const creationDetails = request.body
-    console.log('received game request', body)
+    console.log('received game request', creationDetails)
     // if (!body.name || !body.number) return response.status(400).json({
     //     error: 'Number and or name of the person are missing'
     // }) 
@@ -207,7 +212,7 @@ app.post('/api/game', (request, response) => {
     // console.log('new person', person)
 
     // person.save().then(savedPerson => response.json(person))
-    createNewGame(creationDetails).then(gameDetails => response.status(201).send())
+    response.status(201).json(createNewGame(creationDetails))
 })
 
 const PORT = process.env.PORT || 3001;
