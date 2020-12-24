@@ -3,10 +3,12 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useRouteMatch
 } from "react-router-dom";
 
 const Navbar = () => {
+  const match = useRouteMatch()
     return (
           <div class="Navbar">
             <nav>
@@ -15,7 +17,7 @@ const Navbar = () => {
                   <Link to="/">Home</Link>
                 </li>
                 <li>
-                  <Link to="/createGame">Create Game</Link>
+                  <Link to={`${match.url}/createGame`}>Create Game</Link>
                 </li>
                 <li>
                   <Link to="/users">Users</Link>
@@ -28,16 +30,5 @@ const Navbar = () => {
           </div>
       );
 }
-function About() {
-    return <h2>About</h2>;
-  }
-  
-  function Users() {
-    return <h2>Users</h2>;
-  }
-  
-  function Home() {
-    return <h2>Home</h2>;
-  }
 
 export default Navbar

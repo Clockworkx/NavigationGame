@@ -55,22 +55,8 @@ h1 {
 .Navbar {
   background-color: #265b86;
 }
-ul {
-  display: flex;
-  align-items: stretch; /* Default */
-  justify-content: space-between;
-  width: 100%;
-  background: #096fce5b;
-  margin: 0;
-  padding: 0;
-}
-li {
-  display: block;
-  color: #110d04;
-  flex: 0 1 auto; /* Default */
-  list-style-type: none;
-  background: #dacece;
-}
+
+
 
 .infoDisplay {
   background-color: rgb(202, 53, 170);

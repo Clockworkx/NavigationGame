@@ -28,7 +28,17 @@ const getNewRoomName = () => {
     return roomName
     
 }
-console.log({players: [{playerName: 'player1', isReady: false}, {}], isGameStarted: false, isGameConcluded: false})
+const games = []
+const createNewGame = (creationDetails) => {
+    const gameId = games.length 
+    //console.log({...creationDetails, gameId})
+    games.push({...creationDetails, gameId})
+    //console.log(games[gameId])
+    console.log('games', games)
+    return games[gameId]
+}
+
+//console.log({players: [{playerName: 'player1', isReady: false}, {}], isGameStarted: false, isGameConcluded: false})
 io.on('connection', socket => {
     
     socket.emit('SMConnectionReceived', `Connected to server`)
@@ -39,13 +49,45 @@ io.on('connection', socket => {
         // console.log(io.sockets.adapter.rooms)
 
     })
-    socket.on('CMCreateGame', (gameOptions) => {
-        console.log('CMInvitePlayer', gameOptions)
-        socket.join(`game${rooms.length+1}`)
+    socket.on('CMPlayerReady', (player, gameId) => {
+        const playerName = player.name
+        console.log('CMPlayerReady', playerName, gameId)
+        console.log('games bf', games)
+        const game = games[gameId]
+        
+        if(games[gameId]) {
+            
+            console.log('players', game.players)
+            const playerIndex = game.players.findIndex(player => player.name === playerName)
+            const sPlayer = games[gameId].players[playerIndex]
+            console.log(playerIndex)
+            games[gameId].players[playerIndex].ready = !sPlayer.ready
+
+            socket.emit('SMPlayerConfirmReady', sPlayer)
+
+
+        }
+        
+        console.log('games after', games)
+
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
     })
+    socket.on('CMPlayerSetName', (playerName, gameId) => {
+        console.log('CMPlayerSetName', playerName, gameId)
+        if (games[gameId].players.some(player => player.name === playerName)) return socket.emit('SMPlayerDenySetName', 'name is used already')
+        
+        if (games[gameId]) games[gameId].players.push({name:playerName, ready: false})
+        socket.emit('SMPlayerConfirmSetName', playerName )
+        socket.emit('SMGamePlayerJoin', playerName )
+
+        console.log(games)
+        // console.log(socket.rooms)
+        // console.log(io.sockets.adapter.rooms)
+
+    })
+    
     console.log('user connected', socket.id)
     socket.on('disconnect', () => {
         console.log('disconnect')
@@ -61,9 +103,9 @@ io.on('connection', socket => {
         // }) 
         
     })
-    socket.onAny((eventName, ...args) => {
-        console.log(eventName)
-      });
+    // socket.onAny((eventName, ...args) => {
+    //     console.log(eventName)
+    //   });
       socket.on('connect_error', function(err) {
         console.log("client connect_error: ", err);
     });
@@ -136,15 +178,7 @@ const getLocations = () => {
    return locations
 }
 
-const games = []
-const createNewGame = (creationDetails) => {
-    const gameId = games.length 
-    console.log({...creationDetails, gameId})
-    games.push({...creationDetails, gameId})
-    console.log(games[gameId])
-    console.log('games', games)
-    return games[gameId]
-}
+
 
 app.use(cors())
 
@@ -197,7 +231,7 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/game', (request, response) => {
     const creationDetails = request.body
-    console.log('received game request', creationDetails)
+    //console.log('received game request', creationDetails)
     // if (!body.name || !body.number) return response.status(400).json({
     //     error: 'Number and or name of the person are missing'
     // }) 

@@ -8,26 +8,38 @@ import {
 import CreateGame from './components/CreateGame'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
+import GameHome from './components/GameHome'
 
 const App = () => {
-    return (
-          <div className="Home">
-                          
-            {/* A <Switch> looks through its children <Route>s and
-                renders the first one that matches the current URL. */}
-            <Switch>
-              <Route path="/createGame">
-                <CreateGame />
-              </Route>
-              <Route path="/users">
-                <Home />
-              </Route>
-              <Route exact path="/">
-                <Home />
-              </Route>
-            </Switch>
-          </div>
-      );
+  return (
+    <Router>
+      <div>
+        <ul>
+          <li>
+          <Link to="/game">Game</Link>
+          </li>
+          <li>
+          <Link to="/">Home</Link>
+          </li>
+          <li>
+          <Link to="/users">Users</Link>
+          </li>
+        </ul>
+
+        <Switch>
+          <Route path="/users">
+          <h1>rendered Users</h1>
+          </Route>
+          <Route path="/game">
+            <GameHome/>
+          </Route>
+          <Route path="/">
+            <h1>Home render</h1>
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
 }
 
 export default App
