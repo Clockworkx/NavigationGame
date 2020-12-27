@@ -19,6 +19,7 @@ import {
 import CreateGame from './CreateGame'
 import GameLobby from "./GameLobby";
 
+//team mode
 
 const GameHome = () => {
   let match = useRouteMatch()

@@ -40,11 +40,12 @@ const createNewGame = (creationDetails) => {
 
 //console.log({players: [{playerName: 'player1', isReady: false}, {}], isGameStarted: false, isGameConcluded: false})
 io.on('connection', socket => {
-    
+    console.log(io.sockets.adapter.rooms)
     socket.emit('SMConnectionReceived', `Connected to server`)
+    socket.join(`game${rooms.length+1}`)
     socket.on('CMCreateGame', () => {
         console.log('create game')
-        socket.join(`game${rooms.length+1}`)
+
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
@@ -52,41 +53,58 @@ io.on('connection', socket => {
     socket.on('CMPlayerReady', (player, gameId) => {
         const playerName = player.name
         console.log('CMPlayerReady', playerName, gameId)
-        console.log('games bf', games)
         const game = games[gameId]
         
         if(games[gameId]) {
             
-            console.log('players', game.players)
+            console.log('players before', game.players)
             const playerIndex = game.players.findIndex(player => player.name === playerName)
             const sPlayer = games[gameId].players[playerIndex]
-            console.log(playerIndex)
-            games[gameId].players[playerIndex].ready = !sPlayer.ready
+            console.log('bforesplayer', sPlayer)
 
+            console.log('playerindex', playerIndex)
+            games[gameId].players[playerIndex].ready = !sPlayer.ready
+            console.log('players after', game.players)
+            console.log('splayer', sPlayer)
             socket.emit('SMPlayerConfirmReady', sPlayer)
+            io.to('game1').emit('SMChangeLobbyPlayerState', sPlayer)
+            //if player is within game
 
 
         }
-        
-        console.log('games after', games)
 
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
     })
+    socket.on('CMStartGameRequest', (gameId) => {
+        if (games[gameId].players.some(player => player.ready === false)) 
+       return io.to('game1').emit('SMStartGameDecline', 'Not All Players are ready')
+       io.to('game1').emit('SMStartGameAccept', gameId)
+
+        
+    })
+    //ChangeLobbyPlayerState(newPlayerState)
     socket.on('CMPlayerSetName', (playerName, gameId) => {
         console.log('CMPlayerSetName', playerName, gameId)
         if (games[gameId].players.some(player => player.name === playerName)) return socket.emit('SMPlayerDenySetName', 'name is used already')
         
         if (games[gameId]) games[gameId].players.push({name:playerName, ready: false})
         socket.emit('SMPlayerConfirmSetName', playerName )
-        socket.emit('SMGamePlayerJoin', playerName )
-
+       // socket.emit('SMGamePlayerJoin', playerName )
+        //socket.to(`$game${gameId}`).emit('SMGamePlayerJoin', playerName )
         console.log(games)
+        io.to('game1').emit('SMGamePlayerJoin', games[gameId].players)  //{name: playerName, ready: false}
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
     })
+    // socket.on('test', (test) => {
+    //    // socket.emit('testReceived', 'received')
+    //     console.log('test')
+    //     io.to('game1').emit('testReceived', 'received')
+    //     // testFunc()
+    // })
     
     console.log('user connected', socket.id)
     socket.on('disconnect', () => {
@@ -115,6 +133,9 @@ io.on('connection', socket => {
     });
 
 })
+const testFunc = () => {
+    io.to('game1').emit('testReceived', 'received')
+}
 // const randomPointsOnPolygon = require('random-position-in-polygon');
 // const turf = require('turf');
  
