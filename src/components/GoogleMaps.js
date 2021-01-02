@@ -3,7 +3,7 @@ import { GoogleMap, useLoadScript, Marker, InfoWindow, StreetViewPanorama } from
 import { useState, useRef, useCallback } from 'react'
 // import mapStyle from '../mapStyles'
 import '../index.css'
-
+import {socket} from '../services/socket'
 import { formatRelative } from "date-fns";
 
 const libraries = ["places"]
@@ -12,26 +12,22 @@ const mapContainerStyle = {
     height: "100%"
 }
 
-const center = {
-    lat: 40.745,
-    lng: -38.523
-}
 //styles: mapStyle,
 const options = {
-
     disableDefaultUI: true,
     zoomControl: true
 }
 
 
-const Map = () => {
+const Map = ({location, guessMarkers, marker, setMarker, player, mapOptions, gameId, round}) => {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: 'AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c',
         libraries,
     })
 
-    const [marker, setMarker] = useState({lat: 0, lng: 0})
+    //const [marker, setMarker] = useState(null)
     const [selected, setSelected] = useState(null)
+  //  const [markers, setMarkers] = useState(null)
     //   const [coords, setCoords] = useState([])
 
     // const [sizeWH, setSizeWH] = useState({ width: 320, height: 200 })
@@ -44,16 +40,21 @@ const Map = () => {
 
 
     const handleMapClick = useCallback(event => {
+        // console.log('object', guessMarkers)
+        // if (guessMarkers) return 
+        const marker = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng()
+        }
+        socket.emit('CMSubmitGuess', player, marker, gameId, round )
         setMarker({
             lat: event.latLng.lat(),
-            lng: event.latLng.lng(),
-            time: new Date()
+            lng: event.latLng.lng()
         })
     }, [])
 
     const mapRef = useRef();
     const onMapLoad = useCallback(map => mapRef.current = map, [])
-    const [test, setTest] = useState('null')
     
     if (loadError) return "Error loading maps";
     if (!isLoaded) return "Loading Maps"
@@ -64,13 +65,33 @@ const Map = () => {
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 zoom={3}
-                center={center}
+                center={location}
                 options={options}
                 onClick={handleMapClick}
                 onLoad={onMapLoad}
             >
-                if (marker)
+
+                {marker 
+                ? <Marker
+                position={{ lat: marker.lat, lng: marker.lng }}
+                icon={{
+                    url: "/test.png",
+                    scaledSize: new window.google.maps.Size(30, 30),
+                    origin: new window.google.maps.Point(0, 0),
+                    anchor: new window.google.maps.Point(15, 15)
+                }}
+                onClick={() => {
+                    setSelected(marker)
+                }}
+            />
+                : null
+            }
+            {guessMarkers ? console.log('leguessmrkers', guessMarkers):console.log('guessmarkers not there', mapOptions)}
+            {guessMarkers
+            ? Object.values(guessMarkers).map(marker => {console.log('marker', marker)
+               return (
                 <Marker
+                    key={`${marker.lat + marker.lng}`}
                     position={{ lat: marker.lat, lng: marker.lng }}
                     icon={{
                         url: "/test.png",
@@ -82,6 +103,10 @@ const Map = () => {
                         setSelected(marker)
                     }}
                 />
+            )})
+            : null
+        } 
+
                 {selected ? (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }}
                         onCloseClick={() => setSelected(null)}>
@@ -95,23 +120,26 @@ const Map = () => {
     )
 }
 
-const StreetView = () => {
+const StreetView = ({location, setIsStreetViewRendered}) => {
+    console.log('LOCA in strteetview', location)
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: 'AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c',
         libraries,
     })
     //   const [coords, setCoords] = useState([])
-    const [test, setTest] = useState('null')
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback(map => mapRef.current = map, [])
     const streetViewRef = React.useRef()
-    const onStreetViewLoad = useCallback(streetView => streetViewRef.current = streetView, [])
+    const onStreetViewLoad = useCallback(streetView => {
+        console.log('streetvie rendered', new Date().toISOString())
+        setIsStreetViewRendered(true) 
+        return streetViewRef.current = streetView 
+    }, [setIsStreetViewRendered])
 
     if (loadError) return "Error loading maps";
-    if (!isLoaded) return "Loading Maps"
+    if (!isLoaded) return (<div><p>"Loading Maps"</p></div>)
 
-    const streetViewPosition = {lat: -3.745, lng: -38.523}
 
     return (
         <div className="StreetView">
@@ -120,18 +148,18 @@ const StreetView = () => {
                 <button onClick={() =>
                     console.log(streetViewRef.current)} >streetViewRef</button>
                 <button onClick={() =>
-                    streetViewRef.current.setPosition(streetViewPosition)} >back to start</button>
+                    streetViewRef.current.setPosition(location)} >back to start</button>
                 <button onClick={() =>
                     console.log(streetViewRef.current.getLocation().latLng.lat(), streetViewRef.current.getLocation().latLng.lat())} >get Position street VIew</button>
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 zoom={3}
-                center={center}
+                center={location}
                 options={options}
                 onLoad={onMapLoad}
             >
                 <StreetViewPanorama
-                    position={streetViewPosition}
+                    position={location}
                     visible={true}
                     options={{ disableDefaultUI: true, enableCloseButton: false, showRoadLabels: false }}
                     onLoad={onStreetViewLoad}

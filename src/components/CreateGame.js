@@ -14,25 +14,28 @@ const { useState } = require("react")
 const {socket} = require('../services/socket')
 
 
-const CreateGame = () => {
+const CreateGame = ({setLocations}) => {
     let history = useHistory();
     console.log('asd', history)
     const gameOptions = {
         gamemode: 'famous places',
         time: 300,
         gameLeader: 'Playername',
-        players: []
+        players: [],
+        rounds: []
     }
 
     const handleCreateGame = (event) => {
         event.preventDefault()
         socket.emit('CMCreateGame', gameOptions)
+        console.log('work?')
         gameService.createGame(gameOptions).then(response => {
-            console.log(response)
+            const locations = response.locations
+            setLocations(locations)
             const gameId = response.gameId
             history.push(`${gameId}/lobby`)
         })
-        .catch(error => console.log(error))
+        .catch(error => console.log('yes error', error))
 
 
     }

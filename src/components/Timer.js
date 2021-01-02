@@ -29,9 +29,9 @@ function useTimer(initial) {
   }
   
   function Timer({setTimerState}) {
-    const { timer, formatted } = useTimer(2)
-    console.log({ timer, formatted })
-    console.log(timer)
+    const { timer, formatted } = useTimer(4)
+   // console.log({ timer, formatted })
+   // console.log(timer)
     setTimerState(timer)
     return <div>{timer} - {formatted.minutes}:{formatted.seconds}</div>
   }

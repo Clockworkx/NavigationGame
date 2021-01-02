@@ -16,6 +16,7 @@ const Person = require('./models/person')
 //const geoJSON = require('./countries.json')
 const fetch = require('node-fetch')
 var streetview = require('awesome-streetview')
+const { resolve } = require('path')
 
 let rooms = []
 console.log('romlength', rooms.length)
@@ -31,10 +32,12 @@ const getNewRoomName = () => {
 const games = []
 const createNewGame = (creationDetails) => {
     const gameId = games.length 
+    const locations = getLocations()
     //console.log({...creationDetails, gameId})
-    games.push({...creationDetails, gameId})
+    games.push({...creationDetails, gameId, locations})
     //console.log(games[gameId])
     console.log('games', games)
+   // console.log({gameId: games[gameId], locations})
     return games[gameId]
 }
 
@@ -51,60 +54,91 @@ io.on('connection', socket => {
 
     })
     socket.on('CMPlayerReady', (player, gameId) => {
-        const playerName = player.name
-        console.log('CMPlayerReady', playerName, gameId)
-        const game = games[gameId]
+        if (!games[gameId]?.players) return console.log(`CMPlayerReady with undefined games[gameId] or .players`)
         
-        if(games[gameId]) {
-            
-            console.log('players before', game.players)
-            const playerIndex = game.players.findIndex(player => player.name === playerName)
-            const sPlayer = games[gameId].players[playerIndex]
-            console.log('bforesplayer', sPlayer)
+        const playerName = player.name
+        const game = games[gameId]
 
-            console.log('playerindex', playerIndex)
-            games[gameId].players[playerIndex].ready = !sPlayer.ready
-            console.log('players after', game.players)
-            console.log('splayer', sPlayer)
-            socket.emit('SMPlayerConfirmReady', sPlayer)
-            io.to('game1').emit('SMChangeLobbyPlayerState', sPlayer)
-            //if player is within game
+        console.log('CMPlayerReady', playerName, gameId)
 
+        console.log('players before', game.players)
+        const playerIndex = game.players.findIndex(player => player.name === playerName)
+        const sPlayer = games[gameId].players[playerIndex]
+        console.log('bforesplayer', sPlayer)
 
-        }
+        console.log('playerindex', playerIndex)
 
+        games[gameId].players[playerIndex].ready = !sPlayer.ready
+        console.log('players after', game.players)
+        console.log('splayer', sPlayer)
+        socket.emit('SMPlayerConfirmReady', sPlayer)
+        io.to('game1').emit('SMChangeLobbyPlayerState', sPlayer)
+        //if player is within game
+        //associate username and socketid, if socketid dcs, set players: disconnect: true, if reconnect to game
+        //check for user and send back gamedata
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
     })
-    socket.on('CMStartGameRequest', (gameId) => {
-        if (games[gameId].players.some(player => player.ready === false)) 
-       return io.to('game1').emit('SMStartGameDecline', 'Not All Players are ready')
-       io.to('game1').emit('SMStartGameAccept', gameId)
+    socket.on('CMStartGameRequest', (gameId, players) => {
 
-        
+        //fix startgame without players
+        if (!games[gameId]?.players) return console.log('game or players', gameId, 'not defined')
+        if (games[gameId].players.some(player => player.ready === false))
+            return io.to('game1')
+                    .emit('SMStartGameDecline', 'Not All Players are ready')
+        console.log(games[gameId].players)
+
+        let playerNames = {}
+        for (let i = 0; i < games[gameId].players.length; i++){
+            console.log(games[gameId].players[i])
+            const playerName = games[gameId].players[i].name
+            console.log('playerName', playerName)
+            playerNames[playerName] = null
+            
+        }
+        console.log(playerNames)
+
+        for (let i = 0; i < 5; i++){
+            games[gameId].rounds.push({...playerNames})
+        }
+        console.log('rounds after request', games[gameId].rounds)
+        io.to('game1').emit('SMStartGameAccept', gameId)
     })
+
     //ChangeLobbyPlayerState(newPlayerState)
     socket.on('CMPlayerSetName', (playerName, gameId) => {
-        console.log('CMPlayerSetName', playerName, gameId)
+        console.log('CMPlayerSetName', 'playerName', playerName, 'gameID', gameId)
+        if (!games[gameId]) return console.log(`game ${gameId} doesnt exist`)
+
         if (games[gameId].players.some(player => player.name === playerName)) return socket.emit('SMPlayerDenySetName', 'name is used already')
-        
-        if (games[gameId]) games[gameId].players.push({name:playerName, ready: false})
-        socket.emit('SMPlayerConfirmSetName', playerName )
-       // socket.emit('SMGamePlayerJoin', playerName )
-        //socket.to(`$game${gameId}`).emit('SMGamePlayerJoin', playerName )
-        console.log(games)
+
+        games[gameId].players.push({ name: playerName, ready: false })
+        socket.emit('SMPlayerConfirmSetName', playerName)
         io.to('game1').emit('SMGamePlayerJoin', games[gameId].players)  //{name: playerName, ready: false}
         // console.log(socket.rooms)
         // console.log(io.sockets.adapter.rooms)
 
     })
-    // socket.on('test', (test) => {
-    //    // socket.emit('testReceived', 'received')
-    //     console.log('test')
-    //     io.to('game1').emit('testReceived', 'received')
-    //     // testFunc()
-    // })
+    socket.on('CMSubmitGuess', async (player, guessPosition, gameId, round) => {
+        // argument round: first round:  0
+        console.log('rounds', games[gameId].rounds)
+        games[gameId].rounds[round][player.name] = guessPosition
+        console.log('call in submittguess')
+        console.log(player, guessPosition,gameId, round)
+        console.log(new Date())  
+    })
+    socket.on('CMGetMidgameResults', async (player, guessPosition, round) => {
+        // socket.emit('testReceived', 'received')
+         console.log(player, guessPosition, round)
+         // testFunc()
+         const statistics = await finishRound(round)
+         socket.emit('SMFinishRound', statistics)
+     })
+     socket.on('CMGetGuessPositions', (playerName, round, gameId) => {
+         console.log('CMGetGuessPositions', 'playerName', playerName, 'round', round, 'gameid', gameId)
+         socket.emit('SMSendGuessPositions', games[gameId].rounds[round])
+     } )
     
     console.log('user connected', socket.id)
     socket.on('disconnect', () => {
@@ -145,6 +179,12 @@ const testFunc = () => {
 // const points = randomPointsOnPolygon(1, polygon);
 //console.log(points[0])
 
+const finishRound = (round) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => resolve('done'), 1000)
+    })
+}
+
 const isValidStreetView = async (locations) => {
     console.log(`https://maps.googleapis.com/maps/api/streetview/metadata?key=AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c&location=${locations}`)
     const status = await fetch(`https://maps.googleapis.com/maps/api/streetview/metadata?key=AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c&location=${locations}`)
@@ -184,18 +224,18 @@ const getLocations = () => {
     //     return locations
     // })
     let locations = [];
-    for (let i = 0; i < 5; i++) {
-        let newLocation
-        //console.log(locations.some(location => location === newLocation ))
+    let firstLocation = streetview()
+    locations.push({lat: firstLocation[0], lng: firstLocation[1]})
+    
+    for (let i = 0; i < 4; i++) {
+        let newLocation = streetview()
         while (locations.some(location => location === newLocation )) {
             console.log('double')
-                newLocation = streetview()
+            newLocation = streetview()
         }
-        
-        locations[i] = streetview().map(location => ({lat: location}))
+        locations.push({lat: newLocation[0], lng: newLocation[1]})
         //console.log('valid', isValidStreetView(locations[i]))
     }
-   // console.log('loca loca', locations)
    return locations
 }
 

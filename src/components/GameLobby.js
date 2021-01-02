@@ -5,7 +5,7 @@ const { useState, useEffect } = require("react")
 const { socket } = require('../services/socket')
 
 //try it this way if it doesn't work you might need to look at react contexts/redux depending on what you prefer
-const GameLobby = () => {
+const GameLobby = ({setIsGameStarted, player, setPlayer}) => {
   useEffect(() => {
     socket.on('testReceived', (test) => {
       setPlayers(players => [...players, test])
@@ -51,8 +51,7 @@ const GameLobby = () => {
       setTimeout(() => setNotification({message: null}), 3000)
 
     })
-    socket.on('SMStartGameAccept', () => {
-      console.log('history', history)
+    socket.on('SMStartGameAccept', (gameId) => {
       history.push(`/game/${gameId}`)
     })
     
@@ -64,10 +63,11 @@ const GameLobby = () => {
 
 
   const [nameInput, setNameInput] = useState('')
-  const [player, setPlayer] = useState({name: null, ready: false})
+  //const [player, setPlayer] = useState({name: null, ready: false})
   const [players, setPlayers] = useState([{name: 'defaultPlayer', ready: false}])
   const [teststate, setTeststate] = useState(false)
   const [notification, setNotification] = useState({message: null, style: null})
+  
 
   const {gameId} = useParams()
   const history = useHistory();
@@ -77,7 +77,7 @@ console.log('hsitoryasd', history)
   // send playername upon loading the site
   const handleStartGame = () => {
     console.log('Start game button function')
-    socket.emit('CMStartGameRequest', gameId)
+    socket.emit('CMStartGameRequest', gameId, players)
   }
 
   const handleReady = () => {
@@ -98,6 +98,7 @@ console.log('hsitoryasd', history)
   return (
     <div>
       <h1>Game Lobby</h1>
+      
       <ul>
         {players.map(player => <li key={player.name}>{`${player.name} ${player.ready ? 'Ready' : 'NOT ready'}`}</li>)}
       </ul>
@@ -118,8 +119,9 @@ console.log('hsitoryasd', history)
       <Notification notificationDetails={notification}/>
     </div>
   )
-
 }
+
+
 const Notification = ({notificationDetails}) => {
   console.log(notificationDetails)
   const error = {

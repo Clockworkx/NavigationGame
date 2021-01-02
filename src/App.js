@@ -13,7 +13,7 @@ import GameHome from './components/GameHome'
 const App = () => {
   return (
     <Router>
-      <div>
+      <div className="Main in App">
         <ul>
           <li>
           <Link to="/game">Game</Link>
@@ -31,10 +31,12 @@ const App = () => {
           <h1>rendered Users</h1>
           </Route>
           <Route path="/game">
+            
             <GameHome/>
           </Route>
           <Route path="/">
-            <h1>Home render</h1>
+            <div className="home"><h1>Home render</h1></div>
+            
           </Route>
         </Switch>
       </div>

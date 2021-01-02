@@ -37,13 +37,13 @@ const options = {
 }
 
 
-const Map = () => {
+const Map = ({marker, setMarker}) => {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: 'AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c',
         libraries,
     })
 
-    const [marker, setMarker] = useState([])
+    // const [marker, setMarker] = useState([])
     const [selected, setSelected] = useState(null)
     //   const [coords, setCoords] = useState([])
 
@@ -155,21 +155,7 @@ const StreetView = () => {
     )
 }
 
-// {markers.map(marker => (
-//     <Marker
-//         key={`${marker.lat + marker.lng}`}
-//         position={{ lat: marker.lat, lng: marker.lng }}
-//         icon={{
-//             url: "/test.png",
-//             scaledSize: new window.google.maps.Size(30, 30),
-//             origin: new window.google.maps.Point(0, 0),
-//             anchor: new window.google.maps.Point(15, 15)
-//         }}
-//         onClick={() => {
-//             setSelected(marker)
-//         }}
-//     />
-// ))}
+
 
 // const Search = () => {
 //     const { ready, value, suggestions: { status, data }, setValue, clearSuggestion }

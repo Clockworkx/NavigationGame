@@ -18,12 +18,17 @@ import {
 //import Game from './Game'
 import CreateGame from './CreateGame'
 import GameLobby from "./GameLobby";
-
+import Game from './Game'
+import './comp.css'
 //team mode
 
 const GameHome = () => {
+  const [isGameStarted, setIsGameStarted] = useState(false)
+  const [locations, setLocations] = useState(null)
+  const [player, setPlayer] = useState({name: null, ready: false})
+  
   let match = useRouteMatch()
-  console.log(match)
+  console.log('lloca loca loca', locations)
 
   return (
     <div>
@@ -43,17 +48,17 @@ const GameHome = () => {
           that build on the /topics URL path. You can think of the
           2nd <Route> here as an "index" page for all topics, or
           the page that is shown when no topic is selected */}
+          
       <Switch>
         <Route path={`${match.path}/create`}>
           <h1>rendered creategame</h1>
-          <CreateGame />
+          <CreateGame setLocations={setLocations}/>
         </Route>
         <Route path={`${match.path}/:gameId/lobby`}>
-          <GameLobby />
+          <GameLobby setIsGameStarted={setIsGameStarted} player={player} setPlayer={setPlayer}/>
         </Route>
         <Route path={`${match.path}/:gameId`}>
-          <Game />
-          <RenderPath />
+          <Game locations={locations} player={player} />
         </Route>
         <Route path={match.path}>
           <h3>Create or find Game</h3>
@@ -72,168 +77,7 @@ function RenderPath() {
 }
 
 
-const Round = ({setGameStatus}) => {
-  const [ timerState, setTimerState ] = useState(null)
-  console.log('timerState', timerState)
 
-  if (timerState === 0) {
-    setGameStatus("isPostRoundDisplay")
-    return <> </>
-  }
-
-  return (
-    <div className="Container">
-      <Navbar />
-      <StreetView />
-      <Map />
-      <CurrentGameInfo setTimerState={setTimerState}/>
-    </div>
-  )
-}
-const Game = () => {
-  const [gameStatus, setGameStatus] = useState("isInRound")
-  const [currentRound, setCurrentRound] = useState(1)
-
-
-  switch (gameStatus) {
-    case "isInRound":
-      return (
-        <Round setGameStatus={setGameStatus} />
-      )
-      break;
-    case "isPostRoundDisplay":
-        return (
-          <MidgameResults currentRound={currentRound} setCurrentRound={setCurrentRound} setGameStatus={setGameStatus}/>
-        )
-        break;
-    case "isGameOver":
-          return (
-            <GameOverResults />
-          )
-          break;
-  
-    default:
-      return (
-        <div>Something went wrong</div>
-      )
-      break;
-  }
-
-
-}
-
-
-const GameOverResults = () => {
-  return (
-    <div>Game Over</div>
-  )
-}
-
-const InfoDisplay = () => {
-  return (
-    <div className="infoDisplay">
-      {/* mouse click position {coords} */}
-      lorem ipsum
-      {/* <div>
-        <button onClick={() => setDragging(!dragging)}>disable drag</button>
-      </div> */}
-    </div>
-  )
-
-}
-
-const CurrentGameInfo = ({timerState, setTimerState, formatted}) => {
-    const [isGameStarted, setIsGameStarted] = useState(false)
-
-    const handleStartGame = (event) => {
-        console.log(event)
-        setIsGameStarted(!isGameStarted)
-
-    }
-    if (isGameStarted){
-      return (
-        <div>
-            <Timer setTimerState={setTimerState}/>    
-            Round , 
-        </div>
-    )
-    
-    }
-    else return (
-      <div>Waiting for Host to start game
-          <button onClick={handleStartGame}>Start Game</button>
-      </div>
-      )
-}
-
-const Navbar = () => {
-
-  const [inviteReceived, setinviteReceived] = useState(false)
-  useEffect(() => {
-    socket.on('connect', () => {
-      console.log('connected')
-    })
-    socket.on('disconnect', () => {
-      console.log('disconnected')
-    })
-    socket.on('SMConnectionReceived', (arg) => console.log(arg))
-    socket.on('locations_send', (locations) => {
-      console.log('loca', locations)
-
-    })
-    console.log('hi')
-    return () => {
-      socket.offAny(() => console.log('off any'))
-      console.log('cleanup')
-    }
-  }, [])
-  return (
-    <div className="navbar" > <h1>Professor Geo {" "} <span role="img" aria-label="geo">🐱‍🏍</span></h1>
-    {/* <Search /> */}
-    <button onClick={() => {socket.emit('location_request', ['test'])}}>get random map</button>
-    {inviteReceived ? "pending invite" : "no pending invite"}
-    <button onClick={(params) => {
-      socket.emit('CMCreateGame')
-      
-    }}>Create New Game</button>
-    </div>
-  )
-}
-
-const InterimResults = ({currentRound, setCurrentRound, setGameStatus}) => {
-
-  const handleNextRound = () => {
-    if (currentRound < 5){
-      setGameStatus("isInRound")
-      setCurrentRound(previousState => previousState + 1)
-    }
-
-    if (currentRound === 5) {
-      setGameStatus("isGameOver")
-      return <> </>
-    }
-
-  }
-
-  return (
-    <div>
-      Marco da best 
-      <button onClick={handleNextRound}>Next Round</button>
-    </div>
-  )
-
-}
-
-const MidgameResults = ({currentRound, setCurrentRound, setGameStatus}) => {
-
-  return (
-    <div className="midgameResults">
-      <Navbar />
-  <Map/>
-  <InterimResults currentRound={currentRound} setCurrentRound={setCurrentRound} setGameStatus={setGameStatus} />
-    </div>
-  )
-}
 
 
 // const Map = () => {

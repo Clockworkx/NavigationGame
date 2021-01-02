@@ -6,13 +6,15 @@
 
   display: grid;
   grid-template-columns: minmax(300px, 1fr);
-  grid-template-rows: 5vh 60vh 30vh 5vh;
+  grid-template-rows: 60vh 30vh 5vh;
 }
+
 .Game {
   background-color:rgb(202, 53, 170);
 }
 
 body {
+  background-color:rgb(110, 90, 63);
   margin: 0;
 }
 .Game {
@@ -23,6 +25,14 @@ body {
   display: flex;
   justify-content: space-between;
 }
+.gameInfo {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  width: 200px;
+  height: 100px;
+  border: 20px solid blue;
+}
 .midgameResults {
   color: rgb(3, 3, 3);
   font-size: large;
@@ -30,7 +40,7 @@ body {
 
   display: grid;
   grid-template-columns: minmax(300px, 1fr);
-  grid-template-rows: 5vh 60vh 30vh;
+  grid-template-rows: 60vh 30vh;
 }
 
 .Map {

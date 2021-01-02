@@ -1,8 +1,5 @@
-const a = []
-let b 
-console.log(b)
+const a = [{players: []}]
+const b = []
 
-for (let i = 1; i < 3; i++) {
-    console.log(i)
-    
-}
+if (typeof b[0] === 'undefined' || typeof b[0].players === 'undefined') console.log('object')
+
