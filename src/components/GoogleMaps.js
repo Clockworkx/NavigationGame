@@ -47,10 +47,7 @@ const Map = ({location, guessMarkers, marker, setMarker, player, mapOptions, gam
             lng: event.latLng.lng()
         }
         socket.emit('CMSubmitGuess', player, marker, gameId, round )
-        setMarker({
-            lat: event.latLng.lat(),
-            lng: event.latLng.lng()
-        })
+        setMarker(marker)
     }, [])
 
     const mapRef = useRef();
@@ -87,7 +84,7 @@ const Map = ({location, guessMarkers, marker, setMarker, player, mapOptions, gam
                 : null
             }
             {guessMarkers ? console.log('leguessmrkers', guessMarkers):console.log('guessmarkers not there', mapOptions)}
-            {guessMarkers
+            {guessMarkers 
             ? Object.values(guessMarkers).map(marker => {console.log('marker', marker)
                return (
                 <Marker
@@ -106,6 +103,22 @@ const Map = ({location, guessMarkers, marker, setMarker, player, mapOptions, gam
             )})
             : null
         } 
+        {location
+        ?                 <Marker
+        key={`${location.lat + location.lng}`}
+        position={location}
+        icon={{
+            url: "/goalflag.jpg",
+            scaledSize: new window.google.maps.Size(30, 30),
+            origin: new window.google.maps.Point(0, 0),
+            anchor: new window.google.maps.Point(15, 15)
+        }}
+        onClick={() => {
+            setSelected(marker)
+        }}
+    />
+    : null
+    }
 
                 {selected ? (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }}
@@ -140,7 +153,7 @@ const StreetView = ({location, setIsStreetViewRendered}) => {
     if (loadError) return "Error loading maps";
     if (!isLoaded) return (<div><p>"Loading Maps"</p></div>)
 
-
+ //center is location cahnge
     return (
         <div className="StreetView">
             <button onClick={() =>
@@ -171,7 +184,7 @@ const StreetView = ({location, setIsStreetViewRendered}) => {
 }
 
 function haversine_distance(mk1, mk2) {
-    var R = 6371.0710; // Radius of the Earth in miles
+    var R = 6371.0710; // Radius of the Earth in km
     var rlat1 = mk1.position.lat() * (Math.PI/180); // Convert degrees to radians
     var rlat2 = mk2.position.lat() * (Math.PI/180); // Convert degrees to radians
     var difflat = rlat2-rlat1; // Radian difference (latitudes)

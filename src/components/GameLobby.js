@@ -5,7 +5,7 @@ const { useState, useEffect } = require("react")
 const { socket } = require('../services/socket')
 
 //try it this way if it doesn't work you might need to look at react contexts/redux depending on what you prefer
-const GameLobby = ({setIsGameStarted, player, setPlayer}) => {
+const GameLobby = ({setIsGameStarted, player, setPlayer, locations, setLocations}) => {
   useEffect(() => {
     socket.on('testReceived', (test) => {
       setPlayers(players => [...players, test])
@@ -51,7 +51,8 @@ const GameLobby = ({setIsGameStarted, player, setPlayer}) => {
       setTimeout(() => setNotification({message: null}), 3000)
 
     })
-    socket.on('SMStartGameAccept', (gameId) => {
+    socket.on('SMStartGameAccept', (gameId, locations) => {
+      setLocations(locations)
       history.push(`/game/${gameId}`)
     })
     

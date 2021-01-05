@@ -22,7 +22,7 @@ const CreateGame = ({setLocations}) => {
         time: 300,
         gameLeader: 'Playername',
         players: [],
-        rounds: []
+        estimates: []
     }
 
     const handleCreateGame = (event) => {

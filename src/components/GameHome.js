@@ -55,7 +55,7 @@ const GameHome = () => {
           <CreateGame setLocations={setLocations}/>
         </Route>
         <Route path={`${match.path}/:gameId/lobby`}>
-          <GameLobby setIsGameStarted={setIsGameStarted} player={player} setPlayer={setPlayer}/>
+          <GameLobby setIsGameStarted={setIsGameStarted} player={player} setPlayer={setPlayer} locations={locations} setLocations={setLocations}/>
         </Route>
         <Route path={`${match.path}/:gameId`}>
           <Game locations={locations} player={player} />

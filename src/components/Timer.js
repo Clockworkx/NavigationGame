@@ -29,7 +29,7 @@ function useTimer(initial) {
   }
   
   function Timer({setTimerState}) {
-    const { timer, formatted } = useTimer(4)
+    const { timer, formatted } = useTimer(5)
    // console.log({ timer, formatted })
    // console.log(timer)
     setTimerState(timer)

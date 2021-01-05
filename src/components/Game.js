@@ -29,6 +29,8 @@ const Round = ({ setGameStatus, location, player, round, gameId}) => {
   //console.log('timerState', timerState)
 
   if (timerState === 0) {
+    console.log('called cmfinishRound')
+    socket.emit('CMFinishRound', gameId, player.name, round )
     setGameStatus("isPostRoundDisplay")
     return null
   }
@@ -48,8 +50,10 @@ const Round = ({ setGameStatus, location, player, round, gameId}) => {
     </div>
   )
 }
-const InterimResults = ({ round, setRound, setGameStatus }) => {
-
+const InterimResults = ({ round, setRound, setGameStatus, results }) => {
+  console.log('anka', results)
+  const resultsArray = null
+  if (results) resultsArray = Object.entries(results)
   const handleNextRound = () => {
     if (round < 5) {
       setGameStatus("isInRound")
@@ -64,23 +68,41 @@ const InterimResults = ({ round, setRound, setGameStatus }) => {
   }
 
   return (
-    <div>
-      Marco da best
-      <button onClick={handleNextRound}>Next round</button>
-    </div>
+    //  <div>
+    // //   {results 
+    // //   ? <ul>
+    // //     {resultsArray.map(result => <li>result</li>)}
+    // //   </ul>
+    // //   : 'No results received'
+    // //  }
+    //   <button onClick={handleNextRound}>Next round</button>
+    // </div>
+    null
   )
 
 }
 
+const Results = ({playerResult}) => {
+  return (
+    <li> `${playerResult}`</li>
+  )
+}
+
 const MidgameResults = ({ round, setRound, setGameStatus, location, player, gameId}) => {
   const [guessMarkers, setGuessMarkers] = useState(null)
+  const [results, setResults] = useState(null)
 
   console.log('asd', location)
   useEffect(() => {
     socket.emit('CMGetGuessPositions', player, round, gameId)
+    socket.emit('CMGetMidgameResults', gameId, round)
     socket.on('SMSendGuessPositions', (guessPositions) => {
       console.log('asdmarkers', Object.values(guessPositions))
       setGuessMarkers(guessPositions)
+    })
+    socket.on('SMSendMidgameResults', (results) => {
+      console.log('SMSendMidgameResults', results)
+      setResults(results)
     })
 
     return () => {
@@ -90,13 +112,15 @@ const MidgameResults = ({ round, setRound, setGameStatus, location, player, game
 
   console.log('guessmarkers,', guessMarkers)
   return (
+    
     <div className="midgameResults">
+      {console.log('results von midgam rresults', results)}
       <Map location={location} guessMarkers={guessMarkers}/>
       {!guessMarkers
       ? <div>Calculating stats</div>
       : null
     }
-      <InterimResults round={round} setRound={setRound} setGameStatus={setGameStatus}  />
+      <InterimResults round={round} setRound={setRound} setGameStatus={setGameStatus} results={results} />
     </div>
   )
 }
