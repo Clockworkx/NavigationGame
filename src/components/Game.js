@@ -1,197 +1,235 @@
 // import { Rnd } from 'react-rnd'
 // import { useState } from 'react'
-import React from 'react'
-import '../index.css';
-import { Map, StreetView } from './GoogleMaps'
+import React from "react";
+import "../index.css";
+import { Map, StreetView } from "./GoogleMaps";
 // import GameInfo from './components/GameInfo'
-import Timer from './Timer'
-import { useState, useRef, useEffect } from 'react'
-import { socket } from '../services/socket'
+import Timer from "./Timer";
+import { useState, useRef, useEffect } from "react";
+import { socket } from "../services/socket";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
   useRouteMatch,
-  useParams
+  useParams,
 } from "react-router-dom";
-import CreateGame from './CreateGame'
+import CreateGame from "./CreateGame";
 import GameLobby from "./GameLobby";
-import './comp.css'
+import "./comp.css";
 //team mode
 
-const Round = ({ setGameStatus, location, player, round, gameId}) => {
-  const [timerState, setTimerState] = useState(null)
-  const [marker, setMarker] = useState(null)
-  const [isStreetViewRendered, setIsStreetViewRendered] = useState(false)
-  
+const Round = ({ setGameStatus, location, player, round, gameId }) => {
+  const [timerState, setTimerState] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [isStreetViewRendered, setIsStreetViewRendered] = useState(false);
 
   //console.log('timerState', timerState)
 
   if (timerState === 0) {
-    console.log('called cmfinishRound')
-    socket.emit('CMFinishRound', gameId, player.name, round )
-    setGameStatus("isPostRoundDisplay")
-    return null
+    console.log("called cmfinishRound");
+    socket.emit("CMFinishRound", gameId, player.name, round);
+    setGameStatus("isPostRoundDisplay");
+    return null;
   }
 
-  const SubmitGuess = () => {
-    
-  }
+  const SubmitGuess = () => {};
 
   return (
     <div className="Container">
-      <StreetView location={location} setIsStreetViewRendered={setIsStreetViewRendered}/>
-      <Map location={location} marker={marker} setMarker={setMarker} player={player} round={round} gameId={gameId} mapOptions={'midgameResults'}/>
-      <button onClick={() => {
-        console.log('called button submitguess')
-        socket.emit('CMSubmitGuess', player, marker, round)}}>test</button>
-      <GameInfo setTimerState={setTimerState} isStreetViewRendered={isStreetViewRendered} />
+      <StreetView
+        location={location}
+        setIsStreetViewRendered={setIsStreetViewRendered}
+      />
+      <Map
+        location={location}
+        marker={marker}
+        setMarker={setMarker}
+        player={player}
+        round={round}
+        gameId={gameId}
+        mapOptions={"midgameResults"}
+      />
+      <button
+        onClick={() => {
+          console.log("called button submitguess");
+          socket.emit("CMSubmitGuess", player, marker, round);
+        }}
+      >
+        test
+      </button>
+      <GameInfo
+        setTimerState={setTimerState}
+        isStreetViewRendered={isStreetViewRendered}
+      />
     </div>
-  )
-}
+  );
+};
 const InterimResults = ({ round, setRound, setGameStatus, results }) => {
-  console.log('anka', results)
-  const resultsArray = null
-  if (results) resultsArray = Object.entries(results)
+  console.log("anka", results);
+  let resultsArray = null;
+  if (results) resultsArray = Object.entries(results);
+  console.log("resultsarray", resultsArray);
+
   const handleNextRound = () => {
     if (round < 5) {
-      setGameStatus("isInRound")
-      setRound(previousState => previousState + 1)
+      setGameStatus("isInRound");
+      setRound((previousState) => previousState + 1);
     }
 
     if (round === 4) {
-      setGameStatus("isGameOver")
-      return <> </>
+      setGameStatus("isGameOver");
+      return <> </>;
     }
-
-  }
+  };
 
   return (
-    //  <div>
-    // //   {results 
-    // //   ? <ul>
-    // //     {resultsArray.map(result => <li>result</li>)}
-    // //   </ul>
-    // //   : 'No results received'
-    // //  }
-    //   <button onClick={handleNextRound}>Next round</button>
-    // </div>
-    null
-  )
+    <div>
+      {results ? (
+        <ul>
+          {resultsArray.map((result) => (
+            <li>
+              Player {result[0]} Distance to goal {result[1].toFixed(2)}km
+            </li>
+          ))}
+        </ul>
+      ) : (
+        "No results received"
+      )}
+      <button onClick={handleNextRound}>Next round</button>
+    </div>
+  );
+};
 
-}
+const Results = ({ playerResult }) => {
+  return <li> `${playerResult}`</li>;
+};
 
-const Results = ({playerResult}) => {
-  return (
-    <li> `${playerResult}`</li>
-  )
-}
+const MidgameResults = ({
+  round,
+  setRound,
+  setGameStatus,
+  location,
+  player,
+  gameId,
+}) => {
+  const [guessMarkers, setGuessMarkers] = useState(null);
+  const [results, setResults] = useState(null);
 
-const MidgameResults = ({ round, setRound, setGameStatus, location, player, gameId}) => {
-  const [guessMarkers, setGuessMarkers] = useState(null)
-  const [results, setResults] = useState(null)
-
-  console.log('asd', location)
+  console.log("asd", location);
   useEffect(() => {
-    socket.emit('CMGetGuessPositions', player, round, gameId)
-    socket.emit('CMGetMidgameResults', gameId, round)
-    socket.on('SMSendGuessPositions', (guessPositions) => {
-      console.log('asdmarkers', Object.values(guessPositions))
-      setGuessMarkers(guessPositions)
-    })
-    socket.on('SMSendMidgameResults', (results) => {
-      console.log('SMSendMidgameResults', results)
-      setResults(results)
-    })
+    socket.emit("CMGetGuessPositions", player, round, gameId);
+    socket.emit("CMGetMidgameResults", gameId, round);
+    socket.on("SMSendGuessPositions", (guessPositions) => {
+      console.log("asdmarkers", Object.values(guessPositions));
+      setGuessMarkers(guessPositions);
+    });
+    socket.on("SMSendMidgameResults", (results) => {
+      console.log("SMSendMidgameResults", results);
+      setResults(results);
+    });
 
     return () => {
-      socket.offAny(() => console.log('off any'))
-    }
-  },[])
+      socket.offAny(() => console.log("off any"));
+    };
+  }, []);
 
-  console.log('guessmarkers,', guessMarkers)
+  console.log("guessmarkers,", guessMarkers);
   return (
-    
     <div className="midgameResults">
-      {console.log('results von midgam rresults', results)}
-      <Map location={location} guessMarkers={guessMarkers}/>
-      {!guessMarkers
-      ? <div>Calculating stats</div>
-      : null
-    }
-      <InterimResults round={round} setRound={setRound} setGameStatus={setGameStatus} results={results} />
+      {console.log("results von midgam rresults", results)}
+      <Map location={location} guessMarkers={guessMarkers} />
+      {!guessMarkers ? <div>Calculating stats</div> : null}
+      <InterimResults
+        round={round}
+        setRound={setRound}
+        setGameStatus={setGameStatus}
+        results={results}
+      />
     </div>
-  )
-}
+  );
+};
 
 const Game = ({ locations, player }) => {
-  const {gameId} = useParams()
-  const [gameStatus, setGameStatus] = useState("isInRound")
-  const [round, setRound] = useState(0)
+  const { gameId } = useParams();
+  const [gameStatus, setGameStatus] = useState("isInRound");
+  const [round, setRound] = useState(0);
 
-  console.log('locations in game', locations)
+  console.log("locations in game", locations);
   switch (gameStatus) {
     case "isInRound":
       return (
-        <Round setGameStatus={setGameStatus} location={locations[round]} player={player} round={round} gameId={gameId}/>
-      )
+        <Round
+          setGameStatus={setGameStatus}
+          location={locations[round]}
+          player={player}
+          round={round}
+          gameId={gameId}
+        />
+      );
       break;
     case "isPostRoundDisplay":
       return (
-        <MidgameResults round={round} setRound={setRound} setGameStatus={setGameStatus} location={locations[round]} player={player.name} gameId={gameId}/>
-      )
+        <MidgameResults
+          round={round}
+          setRound={setRound}
+          setGameStatus={setGameStatus}
+          location={locations[round]}
+          player={player.name}
+          gameId={gameId}
+        />
+      );
       break;
     case "isGameOver":
-      return (
-        <GameOverResults />
-      )
+      return <GameOverResults />;
       break;
 
     default:
-      return (
-        <div>Something went wrong</div>
-      )
+      return <div>Something went wrong</div>;
       break;
   }
-}
+};
 
 const GameOverResults = () => {
-  return (
-    <div>Game Over</div>
-  )
-}
+  return <div>Game Over</div>;
+};
 
 const InfoDisplay = () => {
   return (
     <div className="infoDisplay">
       {/* mouse click position {coords} */}
-        lorem ipsum
+      lorem ipsum
       {/* <div>
           <button onClick={() => setDragging(!dragging)}>disable drag</button>
         </div> */}
     </div>
-  )
+  );
+};
 
-}
+const GameInfo = ({
+  timerState,
+  setTimerState,
+  formatted,
+  isStreetViewRendered,
+}) => {
+  const [timer2, stimer2] = useState(null);
 
-const GameInfo = ({ timerState, setTimerState, formatted, isStreetViewRendered}) => {
-  const [timer2, stimer2] = useState(null)
-
-  if (!isStreetViewRendered) { 
+  if (!isStreetViewRendered) {
     return (
-    <div className="gameInfo">
-      {console.log('not rendered', new Date().toISOString())}NOT RENDERED</div>
-  )
+      <div className="gameInfo">
+        {console.log("not rendered", new Date().toISOString())}NOT RENDERED
+      </div>
+    );
   }
   return (
     <div className="gameInfo">
-      {console.log('rendreerd at', new Date().toISOString())}
+      {console.log("rendreerd at", new Date().toISOString())}
       <Timer setTimerState={setTimerState} />
-            round ,
+      round ,
     </div>
-  )
-}
+  );
+};
 
 // const Navbar = () => {
 
@@ -227,5 +265,4 @@ const GameInfo = ({ timerState, setTimerState, formatted, isStreetViewRendered})
 //   )
 // }
 
-
-export default Game
+export default Game;

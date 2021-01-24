@@ -147,12 +147,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("CMGetMidgameResults", (gameId, round) => {
-    console.log(games[gameId]);
+    console.log("gameID", games[gameId]);
     console.log("CMGetMidgameResults", gameId, round);
 
     let playerDistances = {};
     Object.entries(games[gameId].estimates[round]).forEach(([key, value]) => {
-      playerDistances[key] = value.distance;
+      console.log("key", key, "value", value);
+      playerDistances[key] = value?.distance || "no guess";
     });
 
     socket.emit("SMSendMidgameResults", playerDistances);
@@ -174,15 +175,21 @@ io.on("connection", (socket) => {
     console.log("called cmfinishRound");
     updateRoundStatistics(playerName, gameId, round);
   });
+
   function updateRoundStatistics(playerName, gameId, round) {
-    const goalPosition = games[gameId].locations[round];
-    const playerGuessPosition = games[gameId].estimates[round][playerName];
+    const goalPosition = games[gameId]?.locations[round];
+    const playerGuessPosition =
+      games[gameId].estimates[round][playerName] || "not guessed";
     console.log("goal position)", goalPosition);
-    console.log("playerguess)", playerGuessPosition);
-    const deltaDistance = haversine_distance(goalPosition, playerGuessPosition);
+    console.log("playerguess", playerGuessPosition);
+    const deltaDistance =
+      haversine_distance(goalPosition, playerGuessPosition) || null;
+    console.log("deltadistAnce", deltaDistance);
+
     console.log("distance from goal", deltaDistance);
-    games[gameId].estimates[round][playerName].distance = deltaDistance;
-    console.log("estiumates,", games[gameId].estimates[round]);
+    if (deltaDistance !== null)
+      games[gameId].estimates[round][playerName].distance = deltaDistance;
+    console.log("estimates,", games[gameId].estimates[round]);
   }
 
   // socket.on('location_request', (object) => {
@@ -204,6 +211,7 @@ io.on("connection", (socket) => {
 });
 
 function haversine_distance(mk1, mk2) {
+  if (!mk1 || !mk2) return null;
   var R = 6371.071; // Radius of the Earth in km
   var rlat1 = mk1.lat * (Math.PI / 180); // Convert degrees to radians
   var rlat2 = mk2.lat * (Math.PI / 180); // Convert degrees to radians
@@ -243,11 +251,11 @@ const finishRound = (round) => {
 };
 
 const isValidStreetView = async (location) => {
-  let radius = 100;
+  let radius = 1000;
   let status = "NOT OK";
 
   //console.log(status);
-  while (status.status !== "OK" && radius < 1000) {
+  while (status.status !== "OK" && radius <= 1000) {
     //console.log('', status)
     status = await fetch(
       `https://maps.googleapis.com/maps/api/streetview/metadata?location=${location}&radius=${radius}&source=default&key=AIzaSyD-H7u_wA8hIqXBZteUdLr4oG0cVNoEl2c`
@@ -303,9 +311,14 @@ async function fetchRandomLand() {
 // }
 
 const getLocations = () => {
+  const getLocationsDate = new Date();
+  console.log("getlocations call");
   return Promise.all(Array.from({ length: 5 }).map(fetchRandomLand)).then(
     (locations) => {
       console.log("loca loca", locations);
+      const afterResolveCall = new Date();
+      const d = afterResolveCall - getLocationsDate;
+      console.log("date", d);
       return locations;
     }
   );
