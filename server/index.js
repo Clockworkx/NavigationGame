@@ -1,19 +1,22 @@
 require("dotenv").config();
+const path = require('path');
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+
 const app = express();
 const httpServer = require("http").createServer(app);
-// const options = { /* ... */ };
+
+app.use(cors());
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
+app.use(express.static('build'))
 
 const Person = require("./models/person");
-//const geoJSON = require('./countries.json')
 const fetch = require("node-fetch");
 var streetview = require("awesome-streetview");
 const { resolve } = require("path");
@@ -83,7 +86,7 @@ io.on("connection", (socket) => {
 
     console.log("playerindex", playerIndex);
 
-    games[gameId].players[playerIndex].ready = !sPlayer.ready;
+    games[gameId].players[playerIndex].ready = !sPlayer?.ready;
     console.log("players after", game.players);
     console.log("splayer", sPlayer);
     socket.emit("SMPlayerConfirmReady", sPlayer);
@@ -340,7 +343,7 @@ const getLocations = () => {
 
 //getLocations()
 
-app.use(cors());
+
 
 app.use(express.json());
 
@@ -362,8 +365,8 @@ app.use(
   )
 );
 
-app.get("/", (request, response) => {
-  response.send("<h1>Seite wäre hier</h1>");
+app.get("/*", (request, response) => {
+  response.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // app.get("/api/game", (request, response) => {
