@@ -90,7 +90,8 @@ const InterimResults = ({ round, setRound, setGameStatus, results }) => {
         <ul>
           {resultsArray.map((result) => (
             <li>
-              Player {result[0]} Distance to goal {result[1].toFixed(2)}km
+              Player {result[0]} Distance to goal{" "}
+              {isNaN(result[1]) ? result[1] : result[1].toFixed(2)}km
             </li>
           ))}
         </ul>
