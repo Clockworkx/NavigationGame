@@ -49,56 +49,20 @@ const Round = ({ setGameStatus, location, player, round, gameId }) => {
         player={player}
         round={round}
         gameId={gameId}
-        mapOptions={"midgameResults"}
+        mapType={"game"}
       />
-      <button
+      {/* <button
         onClick={() => {
           console.log("called button submitguess");
           socket.emit("CMSubmitGuess", player, marker, round);
         }}
       >
         test
-      </button>
+      </button> */}
       <GameInfo
         setTimerState={setTimerState}
         isStreetViewRendered={isStreetViewRendered}
       />
-    </div>
-  );
-};
-const InterimResults = ({ round, setRound, setGameStatus, results }) => {
-  console.log("anka", results);
-  let resultsArray = null;
-  if (results) resultsArray = Object.entries(results);
-  console.log("resultsarray", resultsArray);
-
-  const handleNextRound = () => {
-    if (round < 5) {
-      setGameStatus("isInRound");
-      setRound((previousState) => previousState + 1);
-    }
-
-    if (round === 4) {
-      setGameStatus("isGameOver");
-      return <> </>;
-    }
-  };
-
-  return (
-    <div>
-      {results ? (
-        <ul>
-          {resultsArray.map((result) => (
-            <li>
-              Player {result[0]} Distance to goal{" "}
-              {isNaN(result[1]) ? result[1] : result[1].toFixed(2)}km
-            </li>
-          ))}
-        </ul>
-      ) : (
-        "No results received"
-      )}
-      <button onClick={handleNextRound}>Next round</button>
     </div>
   );
 };
@@ -137,6 +101,7 @@ const MidgameResults = ({
   }, []);
 
   console.log("guessmarkers,", guessMarkers);
+
   return (
     <div className="midgameResults">
       {console.log("results von midgam rresults", results)}
@@ -148,6 +113,43 @@ const MidgameResults = ({
         setGameStatus={setGameStatus}
         results={results}
       />
+    </div>
+  );
+};
+
+const InterimResults = ({ round, setRound, setGameStatus, results }) => {
+  console.log("anka", results);
+  let resultsArray = null;
+  if (results) resultsArray = Object.entries(results);
+  console.log("resultsarray", resultsArray);
+
+  const handleNextRound = () => {
+    if (round < 5) {
+      setGameStatus("isInRound");
+      setRound((previousState) => previousState + 1);
+    }
+
+    if (round === 4) {
+      setGameStatus("isGameOver");
+      return <> </>;
+    }
+  };
+
+  return (
+    <div>
+      {results ? (
+        <ul>
+          {resultsArray.map((result) => (
+            <li>
+              Player {result[0]} Distance to goal{" "}
+              {isNaN(result[1]) ? result[1] : result[1].toFixed(2)}km
+            </li>
+          ))}
+        </ul>
+      ) : (
+        "No results received"
+      )}
+      <button onClick={handleNextRound}>Next round</button>
     </div>
   );
 };

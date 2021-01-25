@@ -30,7 +30,7 @@ const Map = ({
   marker,
   setMarker,
   player,
-  mapOptions,
+  mapType,
   gameId,
   round,
 }) => {
@@ -53,6 +53,8 @@ const Map = ({
   //   })
 
   const handleMapClick = useCallback((event) => {
+    console.log("maptype", mapType);
+    if (mapType !== "game") return;
     // console.log('object', guessMarkers)
     // if (guessMarkers) return
     const marker = {
@@ -94,9 +96,11 @@ const Map = ({
             }}
           />
         ) : null}
+
         {guessMarkers
-          ? console.log("leguessmrkers", guessMarkers)
-          : console.log("guessmarkers not there", mapOptions)}
+          ? console.log("guessMarkers there", guessMarkers)
+          : console.log("guessMarkers not there", guessMarkers)}
+
         {guessMarkers
           ? Object.values(guessMarkers).map((marker) => {
               if (!marker) return null;
@@ -118,7 +122,8 @@ const Map = ({
               );
             })
           : null}
-        {location ? (
+
+        {mapType !== "game" ? (
           <Marker
             key={`${location.lat + location.lng}`}
             position={location}
@@ -134,7 +139,9 @@ const Map = ({
           />
         ) : null}
 
-        {selected ? (
+        {console.log("asd", mapType)}
+
+        {/* {selected ? (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
@@ -144,7 +151,7 @@ const Map = ({
               <p>spotted at {formatRelative(selected.time, new Date())}</p>
             </div>
           </InfoWindow>
-        ) : null}
+        ) : null} */}
       </GoogleMap>
     </div>
   );

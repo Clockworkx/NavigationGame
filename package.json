@@ -2,6 +2,7 @@
   "name": "navigation_simulator",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@reach/combobox": "^0.12.1",
     "@react-google-maps/api": "^1.13.0",
