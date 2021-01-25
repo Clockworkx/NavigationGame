@@ -3,17 +3,18 @@
   src: local("Rubik"), url("./fonts/Rubik-Regular.ttf") format("truetype");
   font-weight: normal;
 }
-
+/* //previous 35 % */
 body {
   background: rgb(2, 0, 36);
   background: linear-gradient(
     343deg,
     rgba(2, 0, 36, 1) 0%,
-    rgba(9, 121, 93, 1) 35%,
+    rgba(9, 121, 93, 1) 43%,
     rgba(0, 212, 255, 1) 100%
   );
   margin: 0;
-  font-family: Pacifico;
+  font-family: Rubiko;
+  color: #6930c3;
 }
 
 html {
@@ -23,7 +24,7 @@ html {
 h1 {
   top: 1rem;
   left: 1rem;
-  color: #eb25f1;
+  color: #6930c3;
   z-index: 15;
   margin: 0;
   padding: 0;
@@ -39,9 +40,10 @@ h1 {
   grid-template-rows: 75vh;
 }
 
+/* //prev navbar color : #265b86; */
 .navbar {
   display: flex;
-  background-color: #265b86;
+  background-color: rgb(4, 67, 87);
   justify-content: space-around;
   align-items: center;
 }
@@ -51,7 +53,8 @@ h1 {
 
 .navbar li a {
   display: inline-block;
-  color: white;
+  /* color: rgb(191, 238, 22); */
+  color: rgb(202, 187, 209);
   padding: 10px 17px;
   text-decoration: none;
 }

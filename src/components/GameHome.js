@@ -19,6 +19,7 @@ import {
 import CreateGame from "./CreateGame";
 import GameLobby from "./GameLobby";
 import Game from "./Game";
+import GameBrowser from "./GameBrowser";
 import "../index.css";
 //team mode
 
@@ -38,6 +39,11 @@ const GameHome = () => {
           the page that is shown when no topic is selected */}
 
       <Switch>
+        <Route path={`${match.path}/join`}>
+          {console.log("path", match.path)}
+          {/* <h1>rendered creategame</h1> */}
+          <GameBrowser />
+        </Route>
         <Route path={`${match.path}/create`}>
           {console.log("path", match.path)}
           {/* <h1>rendered creategame</h1> */}

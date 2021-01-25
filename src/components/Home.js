@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 
 const Home = () => {
   return (
-    <div class="home">
+    <div className="home">
       {/* <Navbar /> */}
 
       <p>Select gamemode, play with friends, solo, </p>
