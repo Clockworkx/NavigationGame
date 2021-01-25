@@ -14,9 +14,15 @@ import { formatRelative } from "date-fns";
 import { Rnd } from "react-rnd";
 
 const libraries = ["places"];
+
 const mapContainerStyle = {
   width: "100%",
   height: "100%",
+};
+
+const center = {
+  lat: 51.442315302157304,
+  lng: 7.352482762465018,
 };
 
 //styles: mapStyle,
@@ -97,7 +103,7 @@ const Map = ({
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={3}
-          center={location}
+          center={center}
           options={options}
           onClick={handleMapClick}
           onLoad={onMapLoad}
