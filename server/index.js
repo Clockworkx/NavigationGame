@@ -280,7 +280,7 @@ const isValidStreetView = async (location) => {
 // const body = await response.json();
 
 async function fetchRandomLand() {
-  return fetch("https://api.3geonames.org/?randomland=DE&json=1")
+  return fetch("https://api.3geonames.org/?randomland=yes&json=1")
     .then((response) => response.json())
     .then((t) => {
       //console.log("random lat long", t.major);
