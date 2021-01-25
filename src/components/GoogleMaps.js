@@ -11,6 +11,7 @@ import { useState, useRef, useCallback } from "react";
 import "../index.css";
 import { socket } from "../services/socket";
 import { formatRelative } from "date-fns";
+import { Rnd } from "react-rnd";
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -41,6 +42,7 @@ const Map = ({
 
   //const [marker, setMarker] = useState(null)
   const [selected, setSelected] = useState(null);
+  const [dragging, setDragging] = useState(false);
   //  const [markers, setMarkers] = useState(null)
   //   const [coords, setCoords] = useState([])
 
@@ -71,77 +73,95 @@ const Map = ({
   if (loadError) return "Error loading maps";
   if (!isLoaded) return "Loading Maps";
 
+  const style = {
+    // display: "flex",
+    // alignItems: "center",
+    // justifyContent: "center",
+    border: "solid 1px #ddd",
+    zIndex: 10000,
+  };
+
   return (
-    <div className="Map">
+    <div className="map">
       {/* <button onClick={() => mapRef.current.panTo({lat: 43, lng: -75})}>pan To from Map reference</button> */}
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        zoom={3}
-        center={location}
-        options={options}
-        onClick={handleMapClick}
-        onLoad={onMapLoad}
+      <Rnd
+        style={style}
+        disableDragging={dragging}
+        default={{
+          x: 0,
+          y: 0,
+          width: 320,
+          height: 200,
+        }}
       >
-        {marker ? (
-          <Marker
-            position={{ lat: marker.lat, lng: marker.lng }}
-            icon={{
-              url: "/test.png",
-              scaledSize: new window.google.maps.Size(30, 30),
-              origin: new window.google.maps.Point(0, 0),
-              anchor: new window.google.maps.Point(15, 15),
-            }}
-            onClick={() => {
-              setSelected(marker);
-            }}
-          />
-        ) : null}
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          zoom={3}
+          center={location}
+          options={options}
+          onClick={handleMapClick}
+          onLoad={onMapLoad}
+        >
+          {marker ? (
+            <Marker
+              position={{ lat: marker.lat, lng: marker.lng }}
+              icon={{
+                url: "/test.png",
+                scaledSize: new window.google.maps.Size(30, 30),
+                origin: new window.google.maps.Point(0, 0),
+                anchor: new window.google.maps.Point(15, 15),
+              }}
+              onClick={() => {
+                setSelected(marker);
+              }}
+            />
+          ) : null}
 
-        {guessMarkers
-          ? console.log("guessMarkers there", guessMarkers)
-          : console.log("guessMarkers not there", guessMarkers)}
+          {guessMarkers
+            ? console.log("guessMarkers there", guessMarkers)
+            : console.log("guessMarkers not there", guessMarkers)}
 
-        {guessMarkers
-          ? Object.values(guessMarkers).map((marker) => {
-              if (!marker) return null;
+          {guessMarkers
+            ? Object.values(guessMarkers).map((marker) => {
+                if (!marker) return null;
 
-              return (
-                <Marker
-                  key={`${marker.lat + marker.lng}`}
-                  position={{ lat: marker.lat, lng: marker.lng }}
-                  icon={{
-                    url: "/test.png",
-                    scaledSize: new window.google.maps.Size(30, 30),
-                    origin: new window.google.maps.Point(0, 0),
-                    anchor: new window.google.maps.Point(15, 15),
-                  }}
-                  onClick={() => {
-                    setSelected(marker);
-                  }}
-                />
-              );
-            })
-          : null}
+                return (
+                  <Marker
+                    key={`${marker.lat + marker.lng}`}
+                    position={{ lat: marker.lat, lng: marker.lng }}
+                    icon={{
+                      url: "/test.png",
+                      scaledSize: new window.google.maps.Size(30, 30),
+                      origin: new window.google.maps.Point(0, 0),
+                      anchor: new window.google.maps.Point(15, 15),
+                    }}
+                    onClick={() => {
+                      setSelected(marker);
+                    }}
+                  />
+                );
+              })
+            : null}
 
-        {mapType !== "game" ? (
-          <Marker
-            key={`${location.lat + location.lng}`}
-            position={location}
-            icon={{
-              url: "/goalflag.jpg",
-              scaledSize: new window.google.maps.Size(30, 30),
-              origin: new window.google.maps.Point(0, 0),
-              anchor: new window.google.maps.Point(15, 15),
-            }}
-            onClick={() => {
-              setSelected(marker);
-            }}
-          />
-        ) : null}
+          {mapType !== "game" ? (
+            <Marker
+              key={`${location.lat + location.lng}`}
+              position={location}
+              icon={{
+                url: "/goalflag.jpg",
+                scaledSize: new window.google.maps.Size(30, 30),
+                origin: new window.google.maps.Point(0, 0),
+                anchor: new window.google.maps.Point(15, 15),
+              }}
+              onClick={() => {
+                setSelected(marker);
+              }}
+            />
+          ) : null}
 
-        {console.log("asd", mapType)}
+          {console.log("asd", mapType)}
 
-        {/* {selected ? (
+          {/* {selected ? (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
@@ -152,7 +172,9 @@ const Map = ({
             </div>
           </InfoWindow>
         ) : null} */}
-      </GoogleMap>
+        </GoogleMap>
+        <button onClick={() => setDragging(!dragging)}>disable dragging</button>
+      </Rnd>
     </div>
   );
 };
@@ -187,13 +209,15 @@ const StreetView = ({ location, setIsStreetViewRendered }) => {
 
   //center is location cahnge
   return (
-    <div className="StreetView">
-      <button onClick={() => console.log(mapRef.current)}>mapRef</button>
+    <div className="street-view">
+      <div className="map-controls">
+        <button onClick={() => streetViewRef.current.setPosition(location)}>
+          back to start
+        </button>
+      </div>
+      {/* <button onClick={() => console.log(mapRef.current)}>mapRef</button>
       <button onClick={() => console.log(streetViewRef.current)}>
         streetViewRef
-      </button>
-      <button onClick={() => streetViewRef.current.setPosition(location)}>
-        back to start
       </button>
       <button
         onClick={() =>
@@ -204,7 +228,7 @@ const StreetView = ({ location, setIsStreetViewRendered }) => {
         }
       >
         get Position street VIew
-      </button>
+      </button> */}
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         zoom={3}

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const path = require('path');
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -14,7 +14,7 @@ const io = require("socket.io")(httpServer, {
     methods: ["GET", "POST"],
   },
 });
-app.use(express.static('build'))
+app.use(express.static("build"));
 
 const Person = require("./models/person");
 const fetch = require("node-fetch");
@@ -177,6 +177,9 @@ io.on("connection", (socket) => {
   socket.on("CMFinishRound", (gameId, playerName, round) => {
     console.log("called cmfinishRound");
     updateRoundStatistics(playerName, gameId, round);
+  });
+  socket.on("CMGetEndgameResults", (gameId) => {
+    socket.emit("SMSendEndgameResults", games[gameId].estimates);
   });
 
   function updateRoundStatistics(playerName, gameId, round) {
@@ -343,8 +346,6 @@ const getLocations = () => {
 
 //getLocations()
 
-
-
 app.use(express.json());
 
 // app.use(express.static('build'))
@@ -366,7 +367,7 @@ app.use(
 );
 
 app.get("/*", (request, response) => {
-  response.sendFile(path.join(__dirname, 'build', 'index.html'));
+  response.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 // app.get("/api/game", (request, response) => {

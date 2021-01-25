@@ -1,15 +1,7 @@
-.Container {
-  color: rgb(3, 3, 3);
-  font-size: large;
-  background-color: #0e8bf1;
-
-  display: grid;
-  grid-template-columns: minmax(300px, 1fr);
-  grid-template-rows: 60vh 30vh 5vh;
-}
-
-.Game {
-  background-color: rgb(202, 53, 170);
+@font-face {
+  font-family: "Rubik";
+  src: local("Rubik"), url("./fonts/Rubik-Regular.ttf") format("truetype");
+  font-weight: normal;
 }
 
 body {
@@ -21,24 +13,70 @@ body {
     rgba(0, 212, 255, 1) 100%
   );
   margin: 0;
-}
-.Game {
-  background-color: rgb(202, 53, 170);
+  font-family: Pacifico;
 }
 
-.Navbar > ul {
-  display: flex;
-  justify-content: space-between;
+html {
+  height: 100%;
 }
-.gameInfo {
+
+h1 {
+  top: 1rem;
+  left: 1rem;
+  color: #eb25f1;
+  z-index: 15;
+  margin: 0;
+  padding: 0;
+}
+
+.game {
+  color: rgb(3, 3, 3);
+  font-size: large;
+  background-color: #0e8bf1;
+
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr);
+  grid-template-rows: 75vh;
+}
+
+.navbar {
+  display: flex;
+  background-color: #265b86;
+  justify-content: space-around;
+  align-items: center;
+}
+.navbar li {
+  display: inline;
+}
+
+.navbar li a {
+  display: inline-block;
+  color: white;
+  padding: 10px 17px;
+  text-decoration: none;
+}
+
+.navbar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar a:hover {
+  background-color: rgb(0, 195, 255);
+  color: black;
+}
+.game-info {
   position: absolute;
   top: 80px;
   right: 20px;
-  width: 200px;
-  height: 100px;
-  border: 10px solid rgb(0, 0, 0);
+  width: 100px;
+  height: 50px;
+  border: 5px solid rgb(0, 0, 0);
+  background-color: teal;
+  z-index: 1;
 }
-.midgameResults {
+.midgame-results {
   color: rgb(3, 3, 3);
   font-size: large;
   background-color: #0e8bf1;
@@ -48,30 +86,31 @@ body {
   grid-template-rows: 60vh 30vh;
 }
 
-.Map {
+.map {
   background-color: #ff6f69;
-  z-index: 5;
+  z-index: 100;
+}
+.button {
+  border: 1px solid black;
+  background-color: blueviolet;
+  border-radius: 2px;
+  box-shadow: 1px 1px #0f1a77;
 }
 
-h1 {
-  top: 1rem;
-  left: 1rem;
-  color: rgb(45, 15, 211);
-  z-index: 15;
-  margin: 0;
-  padding: 0;
+.map-controls {
+  background-color: salmon;
+  position: absolute;
+  right: 500px;
+  top: 10px;
 }
 
-.StreetView {
-  border: 20px solid rgb(15, 219, 219);
+.street-view {
+  /* border: 20px solid rgb(15, 219, 219); */
   background-color: #ffcc5c;
   z-index: 0;
 }
-.Navbar {
-  background-color: #265b86;
-}
 
-.infoDisplay {
+.info-display {
   background-color: rgb(202, 53, 170);
 }
 

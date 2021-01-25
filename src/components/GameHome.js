@@ -1,35 +1,71 @@
 // import { Rnd } from 'react-rnd'
 // import { useState } from 'react'
-import React from 'react'
-import '../index.css';
-import {Map, StreetView} from './GoogleMaps'
+import React from "react";
+import "../index.css";
+import { Map, StreetView } from "./GoogleMaps";
 // import CurrentGameInfo from './components/CurrentGameInfo'
-import Timer from './Timer'
-import { useState, useRef, useEffect } from 'react'
-import {socket} from '../services/socket'
+import Timer from "./Timer";
+import { useState, useRef, useEffect } from "react";
+import { socket } from "../services/socket";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
   useRouteMatch,
-  useParams
+  useParams,
 } from "react-router-dom";
 //import Game from './Game'
-import CreateGame from './CreateGame'
+import CreateGame from "./CreateGame";
 import GameLobby from "./GameLobby";
-import Game from './Game'
-import './comp.css'
+import Game from "./Game";
+import "../index.css";
 //team mode
 
 const GameHome = () => {
-  const [isGameStarted, setIsGameStarted] = useState(false)
-  const [locations, setLocations] = useState(null)
-  const [player, setPlayer] = useState({name: null, ready: false})
-  
-  let match = useRouteMatch()
-  console.log('lloca loca loca', locations)
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [locations, setLocations] = useState(null);
+  const [player, setPlayer] = useState({ name: null, ready: false });
 
+  let match = useRouteMatch();
+  console.log("lloca loca loca", locations);
+
+  return (
+    <div>
+      {/* The Topics page has its own <Switch> with more routes
+          that build on the /topics URL path. You can think of the
+          2nd <Route> here as an "index" page for all topics, or
+          the page that is shown when no topic is selected */}
+
+      <Switch>
+        <Route path={`${match.path}/create`}>
+          {console.log("path", match.path)}
+          {/* <h1>rendered creategame</h1> */}
+          <CreateGame setLocations={setLocations} />
+        </Route>
+        <Route path={`${match.path}/:gameId/lobby`}>
+          <GameLobby
+            setIsGameStarted={setIsGameStarted}
+            player={player}
+            setPlayer={setPlayer}
+            locations={locations}
+            setLocations={setLocations}
+          />
+        </Route>
+        <Route path={`${match.path}/:gameId`}>
+          <Game locations={locations} player={player} />
+        </Route>
+        <Route path={match.path}>
+          <ModeSelection />
+          <h3>Create or find Game</h3>
+        </Route>
+      </Switch>
+    </div>
+  );
+};
+
+const ModeSelection = () => {
+  let match = useRouteMatch();
   return (
     <div>
       <h1>GameHome Render</h1>
@@ -39,46 +75,18 @@ const GameHome = () => {
           <Link to={`${match.url}/create`}>Create Game</Link>
         </li>
         <li>
-          <Link to={`${match.url}/join`}>
-            Join
-          </Link>
+          <Link to={`${match.url}/join`}>Join</Link>
         </li>
       </ul>
-      {/* The Topics page has its own <Switch> with more routes
-          that build on the /topics URL path. You can think of the
-          2nd <Route> here as an "index" page for all topics, or
-          the page that is shown when no topic is selected */}
-          
-      <Switch>
-        <Route path={`${match.path}/create`}>
-          <h1>rendered creategame</h1>
-          <CreateGame setLocations={setLocations}/>
-        </Route>
-        <Route path={`${match.path}/:gameId/lobby`}>
-          <GameLobby setIsGameStarted={setIsGameStarted} player={player} setPlayer={setPlayer} locations={locations} setLocations={setLocations}/>
-        </Route>
-        <Route path={`${match.path}/:gameId`}>
-          <Game locations={locations} player={player} />
-        </Route>
-        <Route path={match.path}>
-          <h3>Create or find Game</h3>
-        </Route>
-      </Switch>
     </div>
   );
-}
-
-
+};
 function RenderPath() {
-  let match = useRouteMatch()
-  console.log(match)
+  let match = useRouteMatch();
+  console.log(match);
   let { topicId } = useParams();
   return <h3>Current path/component: {topicId}</h3>;
 }
-
-
-
-
 
 // const Map = () => {
 
@@ -91,7 +99,6 @@ function RenderPath() {
 //     width: '100%',
 //     height: '100%'
 //   })
-
 
 // const handleMapClick = (eventt) => {
 //   setCoords(`Latitude: ${eventt.latLng.lat()} Longitude: ${eventt.latLng.lng()}`)
@@ -191,7 +198,7 @@ function RenderPath() {
 //             visible={true}
 //             options={{disableDefaultUI: true, enableCloseButton: false}}
 //             onLoad={(panorama => setPano(panorama))}
-            
+
 //           />
 //           { /* Child components, such as markers, info windows, etc. */}
 //           <></>

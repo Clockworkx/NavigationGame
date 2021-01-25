@@ -17,13 +17,27 @@ import {
 } from "react-router-dom";
 import CreateGame from "./CreateGame";
 import GameLobby from "./GameLobby";
-import "./comp.css";
+import "../index.css";
+import { Rnd } from "react-rnd";
 //team mode
 
 const Round = ({ setGameStatus, location, player, round, gameId }) => {
   const [timerState, setTimerState] = useState(null);
   const [marker, setMarker] = useState(null);
   const [isStreetViewRendered, setIsStreetViewRendered] = useState(false);
+  const [RndSize, setRndSize] = useState({ width: 200, height: 200 });
+  const [RndPosition, setRndPosition] = useState({
+    x: 10,
+    y: 10,
+  });
+
+  const style = {
+    // display: "flex",
+    // alignItems: "center",
+    // justifyContent: "center",
+    border: "solid 1px #ddd",
+    zIndex: 10000,
+  };
 
   //console.log('timerState', timerState)
 
@@ -37,11 +51,48 @@ const Round = ({ setGameStatus, location, player, round, gameId }) => {
   const SubmitGuess = () => {};
 
   return (
-    <div className="Container">
+    <div className="game">
       <StreetView
         location={location}
         setIsStreetViewRendered={setIsStreetViewRendered}
       />
+      {/* <Rnd
+        style={style}
+        size={RndSize}
+        position={RndPosition}
+        onDragStop={(e, d) => {
+          this.setState({ x: d.x, y: d.y });
+        }}
+        onResizeStop={(e, direction, ref, delta, position) => {
+          this.setState({
+            width: ref.style.width,
+            height: ref.style.height,
+            ...position,
+          });
+        }}
+      >
+
+      </Rnd> */}
+      {/* <Rnd
+        style={style}
+        default={{
+          x: 0,
+          y: 0,
+          width: 320,
+          height: 200,
+        }}
+      >
+        <Map
+          location={location}
+          marker={marker}
+          setMarker={setMarker}
+          player={player}
+          round={round}
+          gameId={gameId}
+          mapType={"game"}
+        />
+        test
+      </Rnd> */}
       <Map
         location={location}
         marker={marker}
@@ -51,14 +102,17 @@ const Round = ({ setGameStatus, location, player, round, gameId }) => {
         gameId={gameId}
         mapType={"game"}
       />
-      {/* <button
+
+      <button
+        className="button"
         onClick={() => {
           console.log("called button submitguess");
-          socket.emit("CMSubmitGuess", player, marker, round);
+          socket.emit("CMSubmitGuess", player, marker, gameId, round);
+          setTimerState(0);
         }}
       >
-        test
-      </button> */}
+        Guess!
+      </button>
       <GameInfo
         setTimerState={setTimerState}
         isStreetViewRendered={isStreetViewRendered}
@@ -103,7 +157,7 @@ const MidgameResults = ({
   console.log("guessmarkers,", guessMarkers);
 
   return (
-    <div className="midgameResults">
+    <div className="midgame-results">
       {console.log("results von midgam rresults", results)}
       <Map location={location} guessMarkers={guessMarkers} />
       {!guessMarkers ? <div>Calculating stats</div> : null}
@@ -185,7 +239,7 @@ const Game = ({ locations, player }) => {
       );
       break;
     case "isGameOver":
-      return <GameOverResults />;
+      return <GameOverResults gameId={gameId} />;
       break;
 
     default:
@@ -194,13 +248,54 @@ const Game = ({ locations, player }) => {
   }
 };
 
-const GameOverResults = () => {
-  return <div>Game Over</div>;
+const GameOverResults = ({ gameId }) => {
+  const [endgameResults, setEndgameResults] = useState(null);
+  const [endgameResults2, setEndgameResults2] = useState([]);
+
+  // useEffect(() => {
+  //   socket.emit("CMGetEndgameResults", gameId);
+  //   socket.on("SMSendEndgameResults", (results) => {
+  //     console.log("SMSendEndgameResults", results);
+  //     setEndgameResults(results);
+  //   });
+  //   return () => {
+  //     socket.offAny();
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   {
+  //     endgameResults
+  //       ? endgameResults.map((round, index) => {
+  //           for (const [key, value] of Object.entries(round)) {
+  //             console.log("keyvalue of", key, value);
+  //             setEndgameResults2((prev) =>
+  //               prev.push(`Player${key} distance to goal ${value.distance}`)
+  //             );
+  //           }
+  //         })
+  //       : null;
+  //   }
+  //   return () => {};
+  // }, [endgameResults]);
+
+  return (
+    <div>
+      {/* <ul>
+        endgameResults2.map((round, i) =>
+        <li>{
+          Round {i} stats{round}}
+        </li>
+        )
+      </ul> */}
+      <p>Hehe hallo Freunde :D</p>
+    </div>
+  );
 };
 
 const InfoDisplay = () => {
   return (
-    <div className="infoDisplay">
+    <div className="info-display">
       {/* mouse click position {coords} */}
       lorem ipsum
       {/* <div>
@@ -220,13 +315,13 @@ const GameInfo = ({
 
   if (!isStreetViewRendered) {
     return (
-      <div className="gameInfo">
+      <div className="game-info">
         {console.log("not rendered", new Date().toISOString())}NOT RENDERED
       </div>
     );
   }
   return (
-    <div className="gameInfo">
+    <div className="game-info">
       {console.log("rendreerd at", new Date().toISOString())}
       <Timer setTimerState={setTimerState} />
       round ,
