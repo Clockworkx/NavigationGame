@@ -14,17 +14,19 @@ body {
   );
   margin: 0;
   font-family: Rubiko;
-  color: #6930c3;
+  color: #d1cadd;
 }
 
 html {
+  font-size: calc(1rem+5vw);
   height: 100%;
 }
 
 h1 {
+  font-size: calc(1rem + 3vw);
   top: 1rem;
   left: 1rem;
-  color: #6930c3;
+  color: #ffffffc9;
   z-index: 15;
   margin: 0;
   padding: 0;
@@ -43,7 +45,7 @@ h1 {
 /* //prev navbar color : #265b86; */
 .navbar {
   display: flex;
-  background-color: rgb(4, 67, 87);
+  background-color: rgb(2, 0, 36);
   justify-content: space-around;
   align-items: center;
 }
@@ -91,7 +93,7 @@ h1 {
 
 .map {
   background-color: #ff6f69;
-  z-index: 100;
+  z-index: 10000;
 }
 .button {
   border: 1px solid black;
@@ -101,10 +103,8 @@ h1 {
 }
 
 .map-controls {
-  background-color: salmon;
-  position: absolute;
-  right: 500px;
-  top: 10px;
+  position: relative;
+  z-index: 100;
 }
 
 .street-view {
@@ -143,3 +143,21 @@ h1 {
   max-width: 400px;
   z-index: 10;
 } */
+
+a[href^="http://maps.google.com/maps"]
+{
+  display: none !important;
+}
+a[href^="https://maps.google.com/maps"]
+{
+  display: none !important;
+}
+
+.gmnoprint a,
+.gmnoprint span,
+.gm-style-cc {
+  display: none;
+}
+.gmnoprint div {
+  background: none !important;
+}

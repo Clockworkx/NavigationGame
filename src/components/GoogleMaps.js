@@ -48,7 +48,7 @@ const Map = ({
 
   //const [marker, setMarker] = useState(null)
   const [selected, setSelected] = useState(null);
-  const [dragging, setDragging] = useState(false);
+
   //  const [markers, setMarkers] = useState(null)
   //   const [coords, setCoords] = useState([])
 
@@ -88,86 +88,75 @@ const Map = ({
   };
 
   return (
-    <div className="map">
+    <GoogleMap
+      mapContainerStyle={mapContainerStyle}
+      zoom={3}
+      center={center}
+      options={options}
+      onClick={handleMapClick}
+      onLoad={onMapLoad}
+    >
       {/* <button onClick={() => mapRef.current.panTo({lat: 43, lng: -75})}>pan To from Map reference</button> */}
-      <Rnd
-        style={style}
-        disableDragging={dragging}
-        default={{
-          x: 0,
-          y: 0,
-          width: 320,
-          height: 200,
-        }}
-      >
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          zoom={3}
-          center={center}
-          options={options}
-          onClick={handleMapClick}
-          onLoad={onMapLoad}
-        >
-          {marker ? (
-            <Marker
-              position={{ lat: marker.lat, lng: marker.lng }}
-              icon={{
-                url: "/test.png",
-                scaledSize: new window.google.maps.Size(30, 30),
-                origin: new window.google.maps.Point(0, 0),
-                anchor: new window.google.maps.Point(15, 15),
-              }}
-              onClick={() => {
-                setSelected(marker);
-              }}
-            />
-          ) : null}
+      {marker ? (
+        <Marker
+          position={{ lat: marker.lat, lng: marker.lng }}
+          icon={{
+            url: "/test.png",
+            scaledSize: new window.google.maps.Size(30, 30),
+            origin: new window.google.maps.Point(0, 0),
+            anchor: new window.google.maps.Point(15, 15),
+          }}
+          onClick={() => {
+            setSelected(marker);
+          }}
+        />
+      ) : null}
 
-          {guessMarkers
-            ? console.log("guessMarkers there", guessMarkers)
-            : console.log("guessMarkers not there", guessMarkers)}
+      {guessMarkers
+        ? console.log("guessMarkers there", guessMarkers)
+        : console.log("guessMarkers not there", guessMarkers)}
 
-          {guessMarkers
-            ? Object.values(guessMarkers).map((marker) => {
-                if (!marker) return null;
+      {guessMarkers
+        ? Object.values(guessMarkers).map((marker) => {
+            if (!marker) return null;
 
-                return (
-                  <Marker
-                    key={`${marker.lat + marker.lng}`}
-                    position={{ lat: marker.lat, lng: marker.lng }}
-                    icon={{
-                      url: "/test.png",
-                      scaledSize: new window.google.maps.Size(30, 30),
-                      origin: new window.google.maps.Point(0, 0),
-                      anchor: new window.google.maps.Point(15, 15),
-                    }}
-                    onClick={() => {
-                      setSelected(marker);
-                    }}
-                  />
-                );
-              })
-            : null}
+            return (
+              <Marker
+                key={`${marker.lat + marker.lng}`}
+                position={{ lat: marker.lat, lng: marker.lng }}
+                icon={{
+                  url: "/test.png",
+                  scaledSize: new window.google.maps.Size(30, 30),
+                  origin: new window.google.maps.Point(0, 0),
+                  anchor: new window.google.maps.Point(15, 15),
+                }}
+                onClick={() => {
+                  setSelected(marker);
+                }}
+              />
+            );
+          })
+        : null}
 
-          {mapType !== "game" ? (
-            <Marker
-              key={`${location.lat + location.lng}`}
-              position={location}
-              icon={{
-                url: "/goalflag.jpg",
-                scaledSize: new window.google.maps.Size(30, 30),
-                origin: new window.google.maps.Point(0, 0),
-                anchor: new window.google.maps.Point(15, 15),
-              }}
-              onClick={() => {
-                setSelected(marker);
-              }}
-            />
-          ) : null}
+      {mapType !== "game" ? (
+        <Marker
+          key={`${location.lat + location.lng}`}
+          position={location}
+          icon={{
+            url: "/goalflag.jpg",
+            scaledSize: new window.google.maps.Size(30, 30),
+            origin: new window.google.maps.Point(0, 0),
+            anchor: new window.google.maps.Point(15, 15),
+          }}
+          onClick={() => {
+            setSelected(marker);
+          }}
+        />
+      ) : null}
 
-          {console.log("asd", mapType)}
+      {console.log("asd", mapType)}
 
-          {/* {selected ? (
+      {/* {selected ? (
           <InfoWindow
             position={{ lat: selected.lat, lng: selected.lng }}
             onCloseClick={() => setSelected(null)}
@@ -178,10 +167,7 @@ const Map = ({
             </div>
           </InfoWindow>
         ) : null} */}
-        </GoogleMap>
-        <button onClick={() => setDragging(!dragging)}>disable dragging</button>
-      </Rnd>
-    </div>
+    </GoogleMap>
   );
 };
 
@@ -216,11 +202,6 @@ const StreetView = ({ location, setIsStreetViewRendered }) => {
   //center is location cahnge
   return (
     <div className="street-view">
-      <div className="map-controls">
-        <button onClick={() => streetViewRef.current.setPosition(location)}>
-          back to start
-        </button>
-      </div>
       {/* <button onClick={() => console.log(mapRef.current)}>mapRef</button>
       <button onClick={() => console.log(streetViewRef.current)}>
         streetViewRef
@@ -249,35 +230,24 @@ const StreetView = ({ location, setIsStreetViewRendered }) => {
             disableDefaultUI: true,
             enableCloseButton: false,
             showRoadLabels: false,
+            fullscreenControl: true,
+            panControl: true,
+            linksControl: true,
           }}
           onLoad={onStreetViewLoad}
           onStatusChanged={() => console.log("status changed", streetViewRef)}
         />
+        <div className="map-controls">
+          <button
+            className="button"
+            onClick={() => streetViewRef.current.setPosition(location)}
+          >
+            back to start
+          </button>
+        </div>
       </GoogleMap>
     </div>
   );
 };
 
-function haversine_distance(mk1, mk2) {
-  var R = 6371.071; // Radius of the Earth in km
-  var rlat1 = mk1.position.lat() * (Math.PI / 180); // Convert degrees to radians
-  var rlat2 = mk2.position.lat() * (Math.PI / 180); // Convert degrees to radians
-  var difflat = rlat2 - rlat1; // Radian difference (latitudes)
-  var difflon = (mk2.position.lng() - mk1.position.lng()) * (Math.PI / 180); // Radian difference (longitudes)
-
-  var d =
-    2 *
-    R *
-    Math.asin(
-      Math.sqrt(
-        Math.sin(difflat / 2) * Math.sin(difflat / 2) +
-          Math.cos(rlat1) *
-            Math.cos(rlat2) *
-            Math.sin(difflon / 2) *
-            Math.sin(difflon / 2)
-      )
-    );
-  return d;
-}
-
-export { Map, StreetView, haversine_distance };
+export { Map, StreetView };

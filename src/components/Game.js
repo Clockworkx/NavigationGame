@@ -30,14 +30,14 @@ const Round = ({ setGameStatus, location, player, round, gameId }) => {
     x: 10,
     y: 10,
   });
-
-  const style = {
+  const [dragging, setDragging] = useState(true);
+  const [style, setStyle] = useState({
     // display: "flex",
     // alignItems: "center",
     // justifyContent: "center",
     border: "solid 1px #ddd",
     zIndex: 10000,
-  };
+  });
 
   //console.log('timerState', timerState)
 
@@ -73,46 +73,47 @@ const Round = ({ setGameStatus, location, player, round, gameId }) => {
       >
 
       </Rnd> */}
-      {/* <Rnd
-        style={style}
-        default={{
-          x: 0,
-          y: 0,
-          width: 320,
-          height: 200,
-        }}
+      <div
+        onMouseEnter={() =>
+          setStyle({ border: "solid 1px #ddd", zIndex: 10000 })
+        }
+        onMouseLeave={() => setStyle({ border: "solid 20px #ddd", zIndex: 0 })}
       >
-        <Map
-          location={location}
-          marker={marker}
-          setMarker={setMarker}
-          player={player}
-          round={round}
-          gameId={gameId}
-          mapType={"game"}
-        />
-        test
-      </Rnd> */}
-      <Map
-        location={location}
-        marker={marker}
-        setMarker={setMarker}
-        player={player}
-        round={round}
-        gameId={gameId}
-        mapType={"game"}
-      />
+        <Rnd
+          style={style}
+          disableDragging={dragging}
+          default={{
+            x: 0,
+            y: 0,
+            width: 320,
+            height: 200,
+          }}
+        >
+          <Map
+            location={location}
+            marker={marker}
+            setMarker={setMarker}
+            player={player}
+            round={round}
+            gameId={gameId}
+            mapType={"game"}
+          />
+          <button
+            className="button"
+            onClick={() => {
+              console.log("called button submitguess");
+              socket.emit("CMSubmitGuess", player, marker, gameId, round);
+              setTimerState(0);
+            }}
+          >
+            Guess!
+          </button>
+          <button className="button" onClick={() => setDragging(!dragging)}>
+            {dragging ? "enable" : "disable"} dragging
+          </button>
+        </Rnd>
+      </div>
 
-      <button
-        className="button"
-        onClick={() => {
-          console.log("called button submitguess");
-          socket.emit("CMSubmitGuess", player, marker, gameId, round);
-          setTimerState(0);
-        }}
-      >
-        Guess!
-      </button>
       <GameInfo
         setTimerState={setTimerState}
         isStreetViewRendered={isStreetViewRendered}
@@ -203,7 +204,9 @@ const InterimResults = ({ round, setRound, setGameStatus, results }) => {
       ) : (
         "No results received"
       )}
-      <button onClick={handleNextRound}>Next round</button>
+      <button className="button" onClick={handleNextRound}>
+        Next round
+      </button>
     </div>
   );
 };
