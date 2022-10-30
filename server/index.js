@@ -366,6 +366,10 @@ app.use(
   )
 );
 
+app.get("/api/games", (request, response) => {
+  response.send("<h1>hello world</h1>");
+});
+
 app.get("/*", (request, response) => {
   response.sendFile(path.join(__dirname, "build", "index.html"));
 });
@@ -419,7 +423,7 @@ app.post("/api/game", async (request, response) => {
 });
 
 const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`server started on port ${PORT}`);
 });
 

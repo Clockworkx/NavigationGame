@@ -11,39 +11,17 @@ import {
 const { useState } = require("react");
 const { socket } = require("../services/socket");
 
-const CreateGame = ({ setLocations }) => {
-  let history = useHistory();
-  console.log("asd", history);
-  const gameOptions = {
-    gamemode: "famous places",
-    time: 300,
-    gameLeader: "Playername",
-    players: [],
-    estimates: [],
-  };
+const GameBrowser = () => {
+  const [games, setGames] = useState("no games");
 
-  const handleCreateGame = (event) => {
-    event.preventDefault();
-    socket.emit("CMCreateGame", gameOptions);
-    console.log("work?");
-    gameService
-      .createGame(gameOptions)
-      .then((response) => {
-        const locations = response.locations;
-        setLocations(locations);
-        const gameId = response.gameId;
-        history.push(`${gameId}/lobby`);
-      })
-      .catch((error) => console.log("yes error", error));
-  };
-  return (
-    <div>
-      <p>Find games here soon</p>
-      <button className="button" onClick={handleCreateGame}>
-        GameBrowser
-      </button>
-    </div>
-  );
+  gameService
+    .getGames()
+    .then((games) => {
+      setGames(games);
+    })
+    .catch((error) => console.log("error in gamebrowser", error));
+
+  return <div dangerouslySetInnerHTML={games}></div>;
 };
 
-export default CreateGame;
+export default GameBrowser;
